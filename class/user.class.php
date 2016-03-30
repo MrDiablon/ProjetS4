@@ -2,21 +2,6 @@
 require_once('myPDO.include.php') ;
 
 /**
- * Classe d'Exception concernant les connexions de la Classe Utilisateur
- */
-class AuthenticationException extends Exception { }
-
-/**
- * Classe d'Exception concernant les récupération de la Classe Utilisateur dans les données de session
- */
-class NotInSessionException extends Exception { }
-
-/**
- * Classe d'Exception concernant le démarrage d'une session
- */
-class SessionException extends Exception { }
-
-/**
  * Utilisateur permettant d'effectuer des connexions client/serveur
  * Utilisateur issu de la base de données (table user)
  */

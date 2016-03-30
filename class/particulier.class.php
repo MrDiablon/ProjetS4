@@ -10,6 +10,12 @@ class Particulier extends Utilisateur{
 	private $situation_Professionnelle;
 	private $num_Tel;
 
+	/**
+     * Constructeur privé
+     */
+    private function __construct() {
+    }
+
 	public static function createParticulier($params){
 		self::$pdo = myPDO::getInstance();
 		$id = parent::createUtilisateur($params);

@@ -1,10 +1,6 @@
 <?php
 require_once 'autoload.include.php';
 
-$web=new WebPage();
-$web->appendCssUrl("bootstrap/css/bootstrap.min.css");
-$web->appendCssUrl("bootstrap/css/style.css");
-$web->setTitle("Page avec la liste des annonces");
 $annonce= Annonce::getAll();
 
 
@@ -45,6 +41,3 @@ foreach($annonce as $ANNONCE){
 $html .= <<<HTML
 	</table>
 HTML;
-
-$web ->appendContent($html);
-echo $web->toHTML();
