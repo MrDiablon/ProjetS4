@@ -6,6 +6,7 @@ Si vous n'avez pas git télécharger le.
 recuperation du depot (master):
 	
 	dans le dossier destination(dois etre vide) :
+
 		git init //initialise le fichier git 
 		git remote add origin https://github.com/MrDiablon/projetS4.git //donne le chemin d'acces audonner a git
 		git fetch //recupere les donnée du serveur git et vous les met en local dans un fichier temporaire
@@ -16,7 +17,6 @@ l'envoie des commit ce fait comme a l'iut:
 		git add . (ou --all pour prendre en compte les modif de nom et supretion)
 		git commit //permet d'ecrire le message d'escriptif des changement
 		git push origin "nom de la branche" //envoie sur le serveur git
-
 
 Sur windows ou linux(defoit) un commit ouvre le system de saisie par defaut (celui du shell):
 		pour saisire fait "i"
