@@ -288,7 +288,7 @@ SQL;
 
 	public function getDepartement_id(){
 		$pdo = myPDO::getInstance();
-		$sql = "select departement_id as dep_id from departement where departement_id = :id";
+		$sql = "select departement_id as dep_id from Departement where departement_id = :id";
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute(array(':id' => $this->ville_id ));
 		$retour = $stmt->fetch();
@@ -301,7 +301,7 @@ SQL;
 
 	public function getDepartementNom(){
 		$pdo = myPDO::getInstance();
-		$sql = "select departement_nom as dep from departement where departement_id = :id";
+		$sql = "select departement_nom as dep from Departement where departement_id = :id";
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute(array(':id' => $this->ville_id ));
 		$retour = $stmt->fetch();
