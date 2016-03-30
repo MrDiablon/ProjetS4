@@ -1,70 +1,48 @@
+sur window vou spouvez installer git en allant sur le site ils propose un instal laisser tous par default
+
 Lien dossier : https://github.com/MrDiablon/projetS4.git
 Si vous n'avez pas git télécharger le.
 
 recuperation du depot (master):
 	
 	dans le dossier destination(dois etre vide) :
-		git init
-		git remote add origin https://github.com/MrDiablon/projetS4.git
-		git fetch
-		git pull -u : origin master
 
-n'h?sitez pas a tout suprimer et recommencer si vous rencontr? un probl?me avec la recuperation des donn?e.
+		git init //initialise le fichier git 
+		git remote add origin https://github.com/MrDiablon/projetS4.git //donne le chemin d'acces audonner a git
+		git fetch //recupere les donnée du serveur git et vous les met en local dans un fichier temporaire
+		git pull origin "nom de la branche" //met les donner recuperer dans votre dossier courant
+		git checkout "nom de la branche" //vous deplace d'une branche a l'autre
 
-recuperation du depot (branch):
-	(des branches portant votre nom on été crée pour vous permetre de travailler vos modification a partire de n'importe ou)
-	
-	si vous n'avez pas de donnée reprennez les deux premiere ligne de master
-	sinon:
+l'envoie des commit ce fait comme a l'iut:
+		git add . (ou --all pour prendre en compte les modif de nom et supretion)
+		git commit //permet d'ecrire le message d'escriptif des changement
+		git push origin "nom de la branche" //envoie sur le serveur git
 
-		git fetch
-		git pull origin "votre nom"
-
-Sur windows un commit ouvre le system de saisie par defaut (celui du shell):
+Sur windows ou linux(defoit) un commit ouvre le system de saisie par defaut (celui du shell):
 		pour saisire fait "i"
 		pour arreter la saisie "echap"
 		pour quitter ":wq"
 
-l'envoie des commit ce fait comme a l'iut
-
-<<<<<<< HEAD
-avec gitHub vou spouvez paramete les id et mdp avec ceci :
-
-git config --global user.name "Julien Tilap LA VINH"
- git config --global user.email tilap@domain.tld
-
-Je ne les ai pas tester
-=======
-pour push sur vos branch :
-	git push origin "nom de la branche"
->>>>>>> antoine
 
 pour la fusion des branch :
-	git checkout master
-	git merge 'la branche a fusionner)
+
+	git fetch
+	git pull origin "branche" (master si vous voulez aller sur master)
+	git checkout "nom de la branche" (master pour aller sur master)
+	git merge "nom de la branche a fusionner" (cela recuperer les donné de la branche a fusionner et le sfusionne avec la branche courante)
 	git push
-	si une erreur s'affiche c'est que votre master et votre branche ne sont pas sur le même depart
+
+Si une erreur s'affiche c'est que votre master et votre branche ne sont pas sur le même depart
 	
 	Ceci devrait apparaitre
-	
+
 	<<<<<<< HEAD
-	========
-	>>>>>>>>> antoine
-	
-	cela vous indique les zones ou git ne sait pas quoi faire pour cela vous devez supprimer une partie sachant que :
-	
-	<<<<<<< HEAD
-		Tous ce qui est ici etait dans master as so origine
+		Tous ce qui est ici etait dans master as son origine
 	========
 		Rous ce qui ici etait dans votre branche a son origine
 	>>>>>>>>> antoine
 	
+	cela vous indique les zones ou git ne sait pas quoi faire pour cela vous devez supprimer une partie sachant que :
+	parfois une seul est bonne parfois les deux
+	
  	a vous de voir ce qu'il faut garde
- 	
- 	ensuite :
- 	
- 		git add .
- 		git commit
- 		git push
- 		
- 		et c'est bon normalement.
