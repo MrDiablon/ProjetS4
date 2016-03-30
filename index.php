@@ -7,12 +7,9 @@ $web->appendCssUrl("bootstrap/css/bootstrap.min.css");
 $web->appendCssUrl("bootstrap/css/style.css");
 //$web-> appendToHead("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
 
-User::logoutIfRequested();
+Utilisateur::logoutIfRequested();
 
-
-$html =<<<HTML
-  <a href="annonces.php"><button type="button" class="btn btn-default">Voir toutes les annonces</button></a>
-HTML;
+include ('annonces.php');
 
 $web->appendContent($html);
 

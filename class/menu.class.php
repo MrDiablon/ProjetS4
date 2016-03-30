@@ -11,7 +11,7 @@ class Menu {
     public function __construct() {
 		$link = "$_SERVER[REQUEST_URI]";
 		$items = "";
-		$start = '
+		$start = <<<HTML
     <div class="navbar navbar-inverse ">
   		<div class="container">
   			<a href="index.php" class="navbar-brand"> Services </a>
@@ -21,15 +21,16 @@ class Menu {
   					<span class="icon-bar"></span>
   				</button>
   				<div class="collapse navbar-collapse navHeaderCollapse">
-					<ul class="nav navbar-nav navbar-right">';
+					<ul class="nav navbar-nav navbar-right">
+HTML;
 		/*if(substr($link, 0, 6) == '/index' || $link == '/')
 			$items .= '<li class="active">';
 		else
 			$items .= '<li>';
 		$items .= '<a href="index.php">Accueil</a> </li>';*/
 		//$items .= '<li><a href="index.php" data-toggle="modal" data-target=".bs-example-modal-sm">Connexion</a> </li>';
-        $form = User::loginForm('connexion.php');
-        if (!User::isConnected()) {
+        $form = Utilisateur::loginForm('connexion.php');
+        if (!Utilisateur::isConnected()) {
         $connexion = <<<HTML
             <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
               Connexion
@@ -61,13 +62,13 @@ class Menu {
 HTML;
         }
         else {
-            $user = User::createFromSession() ;
+            $user = Utilisateur::createFromSession() ;
             $connexion = <<<HTML
             <li><a href="Formulaireannonce.php">Créer une annonce</a></li>
-            <li><a href="carteVisite.php?ida={$user->id()}" title="Afficher mon profil">{$user->prenomNom()}</a></li>
+            <li><a href="carteVisite.php?ida={$user->getId()}" title="Afficher mon profil">{$user->prenomNom()}</a></li>
             <li>
 HTML;
-            $connexion .= User::logoutForm('Déconnexion', 'index.php') ;
+            $connexion .= Utilisateur::logoutForm('Déconnexion', 'index.php') ;
             $connexion .= "</li>";
         }
 
