@@ -102,7 +102,7 @@ if(isset($_POST['inscription'])){
 //var_dump($params);
 	$user = Particulier::createParticulier($params);
 	var_dump($message);
-	if($message != "upload reussie"){
+	if($message != "upload reussie" || $message != ""){
 		echo "<script>alert($message)</script>"; 
 	}else{
 		echo '<meta http-equiv="refresh" content="0; URL=index.php">';
