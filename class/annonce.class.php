@@ -308,7 +308,7 @@ SQL
 		$stmt->execute(array($title, $desc, $dat,$remun));
 	}
 
-	public function removeAnnonce($idannonce){;
+	public function removeAnnonce($idannonce){
 		$stmt = myPDO::getInstance()->prepare(<<<SQL
 			DELETE *
 			FROM  Annonce
@@ -319,6 +319,49 @@ SQL
 		$stmt->execute();
 
 	}
+
+	public static function cout(){
+		$pdo = myPDO::getInstance();
+		$sql="COUNT(id_Annonce) FROM Annonce";
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute();
+		$res = $stmt->fetch();
+
+		if($res != FALSE){
+			return $res;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	public static function getByNb($deb, $nb){
+		$pdo = myPDO::getInstance();
+
+		if(!is_integer($deb) && !is_integer($nb)){
+			$nb = intval($nb);
+			$deb = intval($deb);
+			if($nb == 0) {
+				$nb = 5;
+			}
+		}
+
+		$sql  = "SELECT * FROM Evenement ORDER BY dateEve desc limit :deb , :nb";
+		$stmt = $pdo->prepare($sql);
+		$stmt-> setFetchMode(PDO::FETCH_CLASS, 'Evenement');
+		if(is_integer($nb)){
+			$stmt->bindParam(':deb', $deb, PDO::PARAM_INT);
+			$stmt->bindParam(':nb', $nb, PDO::PARAM_INT);
+		} 
+
+		$stmt->execute();
+
+		return $stmt->fetchAll();
+
+		}
+		
+	}
+				
 }
 
 ?>
