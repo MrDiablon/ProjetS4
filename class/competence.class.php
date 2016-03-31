@@ -104,7 +104,7 @@ SQL
 		public static function setCompetence($lib,$niv){
 			$stmt = myPDO::getInstance()->prepare(<<<SQL
 			UPDATE `Competence` SET `libelle`= ? ,`niveau` =  WHERE id_Competence = ?
-		SQL
+SQL
 			);
 			$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
 			$stmt->execute(array($lib, $niv));
@@ -118,7 +118,7 @@ SQL
 				WHERE id_Competence = (SELECT id_Competence
 																FROM Competence
 																WHERE id_Competence = '$id');
-		SQL
+SQL
 		);
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
 		$stmt->execute() ;
@@ -132,10 +132,28 @@ SQL
 				WHERE id_Competence = (SELECT id_Competence
 																FROM Competence
 																WHERE id_Competence = '$id');
-		SQL
+SQL
 		);
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
 		$stmt->execute() ;
+		}
+
+		/**
+		*Fonction permettant de retourer les annonces en fonction des compétences
+		* de l'utilisateur connecté
+		*return: un tableau d'annonces
+		*/
+		public function getIdAnnoncesByIdCompetence(){
+			$annonces;
+			$pdo  = myPDO::getInstance();
+			$sql  = "SELECT id_Annonce FROM Necessiter 
+					WHERE id_Competence =:id_Competence";
+			$stmt = $pdo->prepare($sql);
+			$stmt-> execute(array(':id_Competence' => $this->id));
+
+			$annonces = $stmt->fetchAll();
+
+			return $annonces;
 		}
 
 

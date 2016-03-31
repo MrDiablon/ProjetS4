@@ -7,7 +7,10 @@ require_once 'myPDO.include.php';
 */
 class Annonce
 {
-								//Attributs
+				/**********************************
+							ATTRIBUTS
+				**********************************/
+
 	//ID de l'Annonce - int
 	private $id_annonce = null; 
 	//ID de l'annonceur - int
@@ -30,31 +33,35 @@ class Annonce
 	private $commentaire = null; 
 
 
+				/**********************************
+							CONSTRUCTEUR
+				**********************************/
 	/**
 	*Constructeur de la classe Annonce
-	*param - $ID_Annonce: l'ID de l'annonce
+	*param $id_annonce: l'ID de l'annonce
+	*return: l'instance créee
 	*/
-	public static function CreateFromID($id_annonce)
-	{
+	public static function createFromID($id_annonce){
 		$pdo = myPDO::getInstance();
-		//Faire une requête en fonction de l'ID de l'annonce
-		$stmt = $pdo->prepare (<<<SQL
-			SELECT *
-			FROM Annonce
-			WHERE id_Annonce = ?
-SQL
-			);
+		$sql = "SELECT * FROM Annonce WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql);
 
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
-		$stmt->execute(array($id_annonce));
-		if (($object = $stmt->fetch()) !== false) {
-            return $object ;
-        }
-        throw new Exception("Impossible de créer l'annonce") ;
+		$stmt->execute(array(':id_Annonce' => $id_annonce));
+
+		$instance = $stmt->fetch();
+
+		if($instance == FALSE){
+			throw new Exception("Annonce introuvable");
 		}
+        
+        return $instance;
+    }
 
 
-						//GETTERS
+				/**********************************
+							GETTERS
+				**********************************/
 
 	/**
 	*
@@ -113,13 +120,15 @@ SQL
 		return $this->id_competence;
 	}
 
-						//gettersByID
-	//gettersByID
+				/**********************************
+						GETTERS BY ID
+				**********************************/
+	
     public static function getIdAnnonceurByID($id){
         $sql = "SELECT id_Utilisateur FROM Annonce WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($id);
+        $stmt->execute(array(':id' => $id));
         return $stmt->fetch();
         }
 
@@ -127,7 +136,7 @@ SQL
         $sql = "SELECT Uti_id_Utilisateur FROM Annonce WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($id);
+        $stmt->execute(array(':id' => $id));
         return $stmt->fetch();
         }
 
@@ -135,7 +144,7 @@ SQL
         $sql = "SELECT titre FROM Annonce WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($id);
+        $stmt->execute(array(':id' => $id));
         return $stmt->fetch();
         }
 
@@ -143,7 +152,7 @@ SQL
         $sql = "SELECT description FROM Annonce WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($id);
+        $stmt->execute(array(':id' => $id));
         return $stmt->fetch();
         }
 
@@ -151,7 +160,7 @@ SQL
         $sql = "SELECT 'date' FROM Annonce WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($id);
+        $stmt->execute(array(':id' => $id));
         return $stmt->fetch();
         }
 
@@ -159,7 +168,7 @@ SQL
         $sql = "SELECT remuneration FROM Annonce WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($id);
+        $stmt->execute(array(':id' => $id));
         return $stmt->fetch();
         }
 
@@ -167,7 +176,7 @@ SQL
         $sql = "SELECT note FROM Annonce WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($id);
+        $stmt->execute(array(':id' => $id));
         return $stmt->fetch();
         }
 
@@ -175,7 +184,7 @@ SQL
         $sql = "SELECT commentaire FROM Annonce WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($id);
+        $stmt->execute(array(':id' => $id));
         return $stmt->fetch();
         }
 
@@ -183,144 +192,168 @@ SQL
         $sql = "SELECT id_Competence FROM Necessiter WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($id);
+        $stmt->execute(array(':id' => $id));
+
         return $stmt->fetch();
         }
 
 
-						//Setters 
-
+				/**********************************
+							SETTERS
+				**********************************/
 
 
 	public function setTitre($value){
-		$this->description = $value;
+		$this->titre = $value;
 
-		$stmt = myPDO::getInstance();
-		$req  = $stmt->prepare(<<<SQL
-			UPDATE Annonce 
-			SET titre = )
-SQL
-		);
+		$pdo = myPDO::getInstance();
+		$sql = "UPDATE Annonce SET titre = :titre
+								  WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql);
 		$req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$req->execute($value);
+		$req->execute(array(':titre' => $value,
+							':id_Annonce' => $this->id_Annonce)) ;
 
 	}
 
 	public function setDescription($value){
 		$this->description = $value;
 
-		$stmt = myPDO::getInstance();
-		$req  = $stmt->prepare(<<<SQL
-			UPDATE Annonce 
-			SET description =:description);
-SQL
-		);
+		$pdo = myPDO::getInstance();
+		$sql = "UPDATE Annonce SET description = :descr
+								  WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql);
 		$req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$req->execute($value);
+		$req->execute(array(':descr' => $value,
+							':id_Annonce' => $this->id_Annonce));
 	}
 
 	public function setDate($value){
 		$this->date = $value;
 
-		$stmt = myPDO::getInstance();
-		$req  = $stmt->prepare(<<<SQL
-			UPDATE Annonce 
-			SET date = );
-SQL
-		);
+		$pdo = myPDO::getInstance();
+		$sql = "UPDATE Annonce SET 'date' = ':date'
+								  WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql);
 		$req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$req->execute($value);
+		$req->execute(array(':date' => $value,
+							':id_Annonce' => $this->id_Annonce)) ;
 	}
 
 	public function setRemuneration($value){
 		$this->remuneration = $value;
 
-		$stmt = myPDO::getInstance();
-		$req  = $stmt->prepare(<<<SQL
-			UPDATE Annonce 
-			SET remuneration = );
-SQL
-		);
+		$pdo = myPDO::getInstance();
+		$sql = "UPDATE Annonce SET remuneration = :remu 
+								  WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql);
 		$req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$req->execute($value);
+		$req->execute(array(':remu' => $value,
+							':id_Annonce' => $this->id_Annonce)) ;
 	}
 
 	public function setNote($value){
 		$this->note = $value;
 
-		$stmt = myPDO::getInstance();
-		$req  = $stmt->prepare(<<<SQL
-			UPDATE Annonce 
-			SET note = );
-SQL
-		);
+		$pdo = myPDO::getInstance();
+		$sql = "UPDATE Annonce SET note = :note
+								  WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql);
 		$req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$req->execute($value);
+		$req->execute(array(':note' => $value,
+							':id_Annonce' => $this->id_Annonce)) ;
 	}
 
 	public function setCommentaire($value){
 		$this->commentaire = $value;
 
-		$stmt = myPDO::getInstance();
-		$req  = $stmt->prepare(<<<SQL
-			UPDATE Annonce 
-			SET commentaire = );
-SQL
-		);
+		$pdo = myPDO::getInstance();
+		$sql = "UPDATE Annonce SET commentaire = :commentaire
+								  WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql);
 		$req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$req->execute($value);
+		$req->execute(array(':commentaire' => $value,
+							':id_Annonce' => $this->id_Annonce)) ;
 	}
 
 	public function setIdTravailleur($value){
 		$this->id_travailleur = $value;
 
-		$stmt = myPDO::getInstance();
-		$req  = $stmt->prepare(<<<SQL
-			UPDATE Annonce 
-			SET Uti_id_Utilisateur = );
-SQL
-		);
+		$pdo = myPDO::getInstance();
+		$sql = "UPDATE Annonce SET Uti_id_Utilisateur = :Uti_id_Utilisateur 
+								  WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql);
 		$req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$req->execute($value);
+		$req->execute(array(':Uti_id_Utilisateur' => $value,
+							':id_Annonce' => $this->id_Annonce)) ;
 	}
 
 	public function setIdCompetence($value){
 		$this->id_competence = $value;
 
-		$stmt = myPDO::getInstance();
-		$req  = $stmt->prepare(<<<SQL
-			UPDATE 	Necessiter
-			SET 	id_Competence = 
-			WHERE 	id_Annonce = '$this->id_annonce');
-SQL
-		);
+		$pdo = myPDO::getInstance();
+		$sql = "UPDATE Necessiter SET id_Competence = :id_Competence 
+								  WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql);
 		$req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$req->execute($value);
+		$req->execute(array(':id_Competence' => $value,
+							':id_Annonce' => $this->id_Annonce)) ;
 	}
 
+
+				/**********************************
+							METHODES
+				**********************************/
+	/**
+	* Fonction permettant la création d'une annonce dans la BD
+	* Création d'une instance de l'annonce créee
+	* return: l'instance 
+	*/
 	public static function addAnnonce($title, $desc, $dat,$remun){
-		$stmt = myPDO::getInstance()->prepare(<<<SQL
+		$pdo = myPDO::getInstance();
+		$sql1 = (<<<SQL
 			INSERT INTO `Annonce`(`id_Utilisateur`,`Uti_id_Utilisateur`,`note`,`commentaire`,`titre`,`description`,
 								  `date`,`remuneration`) VALUES (1,2,0,"",?,?,?,?)
 SQL
-		);
+	);
+		
+		$stmt = $pdo->prepare($sql1);
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$stmt->execute(array($title, $desc, $dat,$remun));
+		$stmt->execute(array($title, $desc, $date,$remun));
+
+		/*$sql2 = "SELECT id_Annonce FROM Annonce WHERE id_Annonce = :id_Annonce";
+		$stmt = $pdo->prepare($sql2);
+		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
+		// COMMENT SELECTIONNER l'id_Annonce crée précedemmet ?
+		$idAnnonce = $stmt->execute(array(':id_Annonce' => $pdo->lastInsertID()));
+		$instance  = self::createFromID($idAnnonce);
+
+		return $instance;*/
 	}
 
-	public function removeAnnonce($idannonce){
+
+	/**
+	*Fonction permettant de supprimer une Annonce dans la BD
+	*param - idAnnonce = ID de l'annonce à supprimer
+	*
+	*/
+	public function removeAnnonce($idAnnonce){
 		$stmt = myPDO::getInstance()->prepare(<<<SQL
 			DELETE *
 			FROM  Annonce
-			WHERE id_Annonce = '$idannonce';
+			WHERE id_Annonce = :id_Annonce
 SQL
 		);
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$stmt->execute();
+		$stmt->execute(array(':id_Annonce' => $this->id_Annonce)) ;
 
 	}
 
-	public static function cout(){
+	/**
+	* Fonction permettant de compter le nombre d'annonces dans la BD
+	* return: le nombre d'annonces
+	*/
+	public static function count(){
 		$pdo = myPDO::getInstance();
 		$sql="COUNT(id_Annonce) FROM Annonce";
 		$stmt = $pdo->prepare($sql);
@@ -335,6 +368,13 @@ SQL
 		}
 	}
 
+	/**
+	* Fonction permettant selectionner un certain nombre d'annonces dans la BD
+	* en sélectionnant la 1ère ligne et stock les annonces dans un tableau
+	* param $deb: La 1ère ligne à prendre en compte dans la BD
+	* param $nb: le nombre de lignes à prendre dans la BD en partant de $deb
+	* return: le tableau contenant les annonces selectionnées
+	*/
 	public static function getByNb($deb, $nb){
 		$pdo = myPDO::getInstance();
 
@@ -342,13 +382,13 @@ SQL
 			$nb = intval($nb);
 			$deb = intval($deb);
 			if($nb == 0) {
-				$nb = 5;
+				$nb = 10;
 			}
 		}
 
-		$sql  = "SELECT * FROM Evenement ORDER BY dateEve desc limit :deb , :nb";
+		$sql  = "SELECT * FROM Annonce ORDER BY 'date' desc limit :deb , :nb";
 		$stmt = $pdo->prepare($sql);
-		$stmt-> setFetchMode(PDO::FETCH_CLASS, 'Evenement');
+		$stmt-> setFetchMode(PDO::FETCH_CLASS, __CLASS__);
 		if(is_integer($nb)){
 			$stmt->bindParam(':deb', $deb, PDO::PARAM_INT);
 			$stmt->bindParam(':nb', $nb, PDO::PARAM_INT);
@@ -359,8 +399,6 @@ SQL
 		return $stmt->fetchAll();
 
 		}
-		
-	}
 				
 }
 
