@@ -22,11 +22,11 @@ catch (AuthenticationException $e) {
     $p->appendContent('<p class="bg-warning">');
     $p->appendContent($e->getMessage()) ;
     $p->appendContent("</p>");
-    $p->appendContent(Utilisateur::loginForm('connexion.php'));
+    $p->appendContent(Utilisateur::loginFormSHA1('connexion.php'));
 }
 catch (Exception $e) {
     $p->appendContent("Un problème est survenu&nbsp;: {$e->getMessage()}") ;
-    $p->appendContent(Utilisateur::loginForm('connexion.php'));
+    $p->appendContent(Utilisateur::loginFormSHA1('connexion.php'));
 }
 
 // Envoi du code HTML au navigateur du client

@@ -274,23 +274,24 @@ HTML;
         // Mise en place de la session
         self::startSession() ;
         // Mémorisation d'un challenge dans la session
-        $_SESSION[self::session_key]['challenge'] = self::randomString(16) ;
+        if(!isset($_SESSION[self::session_key]['challenge'])){
+            $_SESSION[self::session_key]['challenge'] = self::randomString(16) ;
+        }
         // Le formulaire avec le code JavaScript permettant le hachage SHA1
         // Le retour attendu par le serveur est SHA1(SHA1(pass)+challenge+SHA1(login))
         return <<<HTML
             <script type='text/javascript' src='js/sha1.js'></script>
             <script type='text/javascript'>
                 function crypter(f, challenge) {
+console.log(challenge);
                     if (f.mail.value.length && f.password.value.length) {
                         f.code.value = SHA1(SHA1(f.password.value)+challenge+SHA1(f.mail.value)) ;
                         f.mail.value = f.password.value = '' ;
-console.log(SHA1(f.password.value),f.password.value);
                         return true ;
                     }
                     return false ;
                 }
             </script>
-
             <!--
                 Le formulaire est envoyé selon la méthode GET à des fins de compréhension.
                 Il faut utiliser la méthode POST dans la pratique.
@@ -342,6 +343,8 @@ HTML;
 
         // Mise en place de la session
         self::startSession() ;
+//var_dump($_SESSION[self::session_key]['challenge']);
+//var_dump($data);
         // Préparation de la requête
         $stmt = myPDO::getInstance()->prepare(<<<SQL
             SELECT id_Utilisateur, prenom, nom, image, note_Moyenne, mail
@@ -359,8 +362,6 @@ SQL
         // Test de réussite de la sélection
         $stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
         $utilisateur = $stmt->fetch();
-//var_dump( $utilisateur);
-//var_dump($utilisateur !== false);
         if ($utilisateur !== false) {
             if($utilisateur->isAdmin()){
                 return Admin::createAdminById($utilisateur->getId());
