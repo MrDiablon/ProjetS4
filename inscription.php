@@ -16,14 +16,16 @@ $html = <<<HTML
 		<input type="text" name="prenom" placeholder="Votre prénom" required><br>
 		<label for="departement">departement</label>
 		<select id="departement" onchange="getVille(this)">
-			<option>Autre</option>
+			<option value="0">Autre</option>
 HTML;
+//Departement
 $departement = Particulier::getListDepartement();
 foreach ($departement as $dep) {
 	$html.=<<<HTML
 		<option value="{$dep['id']}">{$dep['departement']}
 HTML;
 }
+//Ville
 $html.=<<<HTML
 		</select><br>
 		<label for="ville_id" id="villeLabel" style="display:none">Ville</label>
@@ -102,7 +104,7 @@ if(isset($_POST['inscription'])){
 //var_dump($params);
 	$user = Particulier::createParticulier($params);
 	var_dump($message);
-	if($message != "upload reussie"){
+	if($message != "upload reussie" || $message != ""){
 		echo "<script>alert($message)</script>"; 
 	}else{
 		echo '<meta http-equiv="refresh" content="0; URL=index.php">';

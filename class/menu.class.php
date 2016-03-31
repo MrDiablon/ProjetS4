@@ -29,7 +29,7 @@ HTML;
 			$items .= '<li>';
 		$items .= '<a href="index.php">Accueil</a> </li>';*/
 		//$items .= '<li><a href="index.php" data-toggle="modal" data-target=".bs-example-modal-sm">Connexion</a> </li>';
-        $form = Utilisateur::loginForm('connexion.php');
+        $form = Utilisateur::loginFormSHA1('connexion.php');
         if (!Utilisateur::isConnected()) {
         $connexion = <<<HTML
             <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
@@ -60,16 +60,15 @@ HTML;
               </div>
             </div>
 HTML;
-        }
-        else {
-            $user = Utilisateur::createFromSession() ;
-            $connexion = <<<HTML
-            <li><a href="Formulaireannonce.php">Créer une annonce</a></li>
-            <li><a href="carteVisite.php?ida={$user->getId()}" title="Afficher mon profil">{$user->prenomNom()}</a></li>
-            <li>
+        } else {
+          $user = Utilisateur::createFromSession() ;
+          $connexion = <<<HTML
+          <li><a href="Formulaireannonce.php">Créer une annonce</a></li>
+          <li><a href="carteVisite.php?ida={$user->getId()}" title="Afficher mon profil">{$user->prenomNom()}</a></li>
+          <li>
 HTML;
-            $connexion .= Utilisateur::logoutForm('Déconnexion', 'index.php') ;
-            $connexion .= "</li>";
+          $connexion .= Utilisateur::logoutForm('Déconnexion', 'index.php') ;
+          $connexion .= "</li>";
         }
 
     $end = <<<HTML
@@ -86,10 +85,10 @@ HTML;
     	<script src ="bootstrap/js/bootstrap.js"></script>
 HTML;
 
-    $this->appendHTML($start) ;
-	$this->appendHTML($items) ;
-	$this->appendHTML($connexion) ;
-	$this->appendHTML($end);
+      $this->appendHTML($start) ;
+      $this->appendHTML($items) ;
+      $this->appendHTML($connexion) ;
+      $this->appendHTML($end);
     }
 
     public function appendHTML($content) {

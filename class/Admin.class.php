@@ -3,7 +3,6 @@
 require_once 'myPDO.include.php';
 
 class Admin extends Utilisateur{
-	private $mail;
 
 	/**
     *fonction permettant d'ajouter une ligne Utilisateur dans 
@@ -16,7 +15,8 @@ class Admin extends Utilisateur{
     */
     public static function createAdmin($params){
     	$id = parent::create($params);
-    	$sql = "INSERT INTO `admin`(`id_Utilisateur`,`nom`, `prenom`, `mdp`, `image`, `note_Moyenne`, `mail`) VALUES (:id,:nom, :prenom, :mdp, :image, :note_moyenne, :mail)"
+        $pdo = myPDO::getInstance();
+    	$sql = "INSERT INTO `admin`(`id_Utilisateur`,`nom`, `prenom`, `mdp`, `image`, `note_Moyenne`, `mail`) VALUES (:id,:nom, :prenom, :mdp, :image, :note_moyenne, :mail)";
     	$stmt = $pdo->prepare($sql);
     	$stmt->execute(array(':id' => $id,
     						':nom' => $params['nom'],
@@ -37,6 +37,7 @@ class Admin extends Utilisateur{
 
     public static function createAdminById($id){
     	$sql = "select nom,prenom,image,note_Moyenne from Admin where id_Utilisateur = :id";
+        $pdo = myPDO::getInstance();
     	$stmt = $pdo->prepare($sql);
     	$stmt->execute(array(":id" => $id));
     	$stmt-> setFetchMode(PDO::FETCH_CLASS,'Admin');
@@ -50,10 +51,12 @@ class Admin extends Utilisateur{
     }
 
     public function modif($id){
+        $pdo = myPDO::getInstance();
     	$sql = "UPDATE `admin` SET `nom`=:nom,`prenom`=:prenom,`mdp`=:mdp,`image`=:image,`note_Moyenne`=:note_Moyenne WHERE id_Utilisateur = :id_Utilisateur";
     	$stmt = $pdo->prepare($pdo);
-    	$stmt->execute(array(":nom" => $this->nom,":prenom"=> $this->prenom,":image"=>$this->image,":note_Moyenne" => $this->note_Moyenne,:"id_Utilisateur"=> $this->id_Utilisateur));
-    	parent::modif($id)
+    	$stmt->execute(array(":nom" => $this->nom,":prenom"=> $this->prenom, ":image"=>$this->image,
+                             ":note_Moyenne" => $this->note_Moyenne,":id_Utilisateur"=> $this->id_Utilisateur));
+    	parent::modif($id);
     }
 
     public function deleteAdmin(){
@@ -63,7 +66,8 @@ class Admin extends Utilisateur{
     	parent::deleteUtilisateur();
     }
 
-    public static function deleteAdmin($id){
+    public static function deleteAdminById($id){
+        $pdo = myPDO::getInstance();
     	$sql = "DELETE FROM `utilisateur` WHERE id_Utilisateur = :id";
     	$stmt = $pdo->prepare($pdo);
     	$stmt->execute(array(":id"=>$id));	
@@ -71,9 +75,10 @@ class Admin extends Utilisateur{
     }
 
     public function isAdmin(){
+        $pdo = myPDO::getInstance();
         $sql = "SELECT id_Utilisateur FROM Admin WHERE id_Utilisateur = :id";
-        $stmt = $pdo->prepare($pdo);
-        $stmt->execute(array(":id" = $this->id_Utilisateur));
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(array(":id" => $this->id_Utilisateur));
         $retour = $stmt->fetch();
 
         if($retour !== false){
@@ -81,5 +86,48 @@ class Admin extends Utilisateur{
         }
 
         return true;
+    }
+
+    public static function countAdmin(){
+        $pdo = myPDO::getInstance();
+        $sql = "select count(id_Utilisateur) from Admin";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();z
+        $retour = $stmt->fetch();
+        if($retour !== FALSE){
+            return $retour;
+        }
+        return 0;
+    }
+
+    public static function getByNb($deb,$nb){
+        $pdo = myPDO::getInstance() ;
+      
+      if(!is_integer($deb) && !is_integer($nb)){
+            $nb= intval($nb);
+            $deb = intval($deb);
+            if ($nb == 0) {
+                $nb = 5;
+            }
+      }
+        //questionnement de la BD
+      $sql=<<<SQL
+      select  nom,prenom,image,note_Moyenne
+      from Admin
+      order by nom desc
+      limit :deb , :nb
+SQL;
+
+      //execution de la commande
+      $stmt = $pdo->prepare($sql) ;
+      $stmt-> setFetchMode(PDO::FETCH_CLASS,__CLASS__);
+      if(is_integer($nb)){
+        $stmt->bindParam(':deb', $deb, PDO::PARAM_INT);
+        $stmt->bindParam(':nb', $nb, PDO::PARAM_INT);
+      }
+    
+      $stmt->execute();
+      //recuperation du resultat de la commande sql
+      return $stmt->fetchAll();
     }
 }

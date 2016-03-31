@@ -98,23 +98,6 @@ class Utilisateur {
         return $this->prenom . " " . $this->nom ;
     }
 
-    static public function loginForm($action, $submitText = 'OK') { //Supprimer les paramètres inutiles ici
-        return <<<HTML
-        <form name="connexion" action="connexion.php" method="POST">
-            <div class="form-group">
-                <label for="mailInput">Adresse e-mail</label>
-                <input class='form-control' id="mailInput"  type="email" name="mail" placeholder="E-mail" required>
-            </div>
-            <div class="form-group">
-                <label for="passInput">Mot de passe</label>
-                <input class='form-control' type="password" name="password" placeholder="Mot de passe" required>
-            </div>
-            <button type="submit" class="btn btn-success" id="valider" value="Connexion">Connexion</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-        </form>
-HTML;
-    }
-
     /**
      * Validation de la connexion de l'utilisateur
      * @param array $data tableau contenant les clés 'login' et 'pass' associées au login et au mot de passe
@@ -189,7 +172,7 @@ HTML;
         return (   isset($_SESSION[self::session_key]['connected'])
                 && $_SESSION[self::session_key]['connected'])
             || (   isset($_SESSION[self::session_key]['user'])
-                && $_SESSION[self::session_key]['user'] instanceof User) ;
+                && $_SESSION[self::session_key]['user'] instanceof Utilisateur) ;
     }
 
     /**
@@ -218,7 +201,7 @@ HTML;
             // Lecture de la variable de session
             $u = $_SESSION[self::session_key]['user'] ;
             // Est-ce un objet et un objet du bon type ?
-            if (is_object($u) && get_class($u) == get_class()) {
+            if (is_object($u) && (get_class($u) == 'Particulier' || get_class($u) == 'Admin' )) {
                 // OUI ! on le retourne
                 return $u ;
             }
@@ -275,6 +258,8 @@ HTML;
                 break ;
             }
         }
+
+        return $s;
     }
 
     /**
@@ -293,33 +278,57 @@ HTML;
         // Le formulaire avec le code JavaScript permettant le hachage SHA1
         // Le retour attendu par le serveur est SHA1(SHA1(pass)+challenge+SHA1(login))
         return <<<HTML
-<script type='text/javascript' src='sha1.js'></script>
-<script type='text/javascript'>
-function crypter(f, challenge) {
-    if (f.login.value.length && f.pass.value.length) {
-        f.code.value = SHA1(SHA1(f.pass.value)+challenge+SHA1(f.login.value)) ;
-        f.login.value = f.pass.value = '' ;
-        return true ;
-    }
-    return false ;
-}
-</script>
-<!--
-Le formulaire est envoyé selon la méthode GET à des fins de compréhension.
-Il faut utiliser la méthode POST dans la pratique.
--->
-<form name='auth' action='$action' method='GET' onSubmit="return crypter(this, '{$_SESSION[self::session_key]['challenge']}')" autocomplete='off'>
-    <input type='text' name='login' value='{$texte_par_defaut}'
-     onClick="if (this.value == '$texte_par_defaut') this.value = ''"
-     onFocus="if (this.value == '$texte_par_defaut') this.value = ''">
-    <input type='password' name='pass'  >
-    <input type='hidden'   name='code'>
-    <input type='submit'   value='{$submitText}'>
-</form>
+            <script type='text/javascript' src='js/sha1.js'></script>
+            <script type='text/javascript'>
+                function crypter(f, challenge) {
+                    if (f.mail.value.length && f.password.value.length) {
+                        f.code.value = SHA1(SHA1(f.password.value)+challenge+SHA1(f.mail.value)) ;
+                        f.mail.value = f.password.value = '' ;
+console.log(SHA1(f.password.value),f.password.value);
+                        return true ;
+                    }
+                    return false ;
+                }
+            </script>
+
+            <!--
+                Le formulaire est envoyé selon la méthode GET à des fins de compréhension.
+                Il faut utiliser la méthode POST dans la pratique.
+            -->
+            <form name='auth' action='$action' method='POST' onSubmit="return crypter(this, '{$_SESSION[self::session_key]['challenge']}')" autocomplete='off'>
+                <div class="form-group">
+                    <label for="mailInput">Adresse e-mail</label>
+                    <input class='form-control' id="mailInput"  type="email" name="mail" placeholder="E-mail" required>
+                </div>
+                <div class="form-group">
+                    <label for="passInput">Mot de passe</label>
+                    <input class='form-control' type="password" name="password" placeholder="Mot de passe" required>
+                </div>
+                <input type='hidden'   name='code'>
+                <button type="submit" class="btn btn-success" id="valider" value="Connexion">Connexion</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+            </form>
 HTML;
     }
 
-        /**
+    static public function loginForm($action, $submitText = 'OK') { //Supprimer les paramètres inutiles ici
+        return <<<HTML
+        <form name="connexion" action="connexion.php" method="POST">
+            <div class="form-group">
+                <label for="mailInput">Adresse e-mail</label>
+                <input class='form-control' id="mailInput"  type="email" name="mail" placeholder="E-mail" required>
+            </div>
+            <div class="form-group">
+                <label for="passInput">Mot de passe</label>
+                <input class='form-control' type="password" name="password" placeholder="Mot de passe" required>
+            </div>
+            <button type="submit" class="btn btn-success" id="valider" value="Connexion">Connexion</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+        </form>
+HTML;
+    }
+
+    /**
      * Validation de la connexion de l'Utilisateur
      * @param array $data tableau contenant la clé 'code' associée au condensat du login et au mot de passe
      * @throws AuthenticationException si l'authentification échoue
@@ -335,11 +344,11 @@ HTML;
         self::startSession() ;
         // Préparation de la requête
         $stmt = myPDO::getInstance()->prepare(<<<SQL
-    SELECT id, prenom, nom, login, phone
-    FROM user
-    WHERE SHA1(CONCAT(sha1pass, :challenge, SHA1(login))) = :code
+            SELECT id_Utilisateur, prenom, nom, image, note_Moyenne, mail
+            FROM utilisateur
+            WHERE SHA1(CONCAT(mdp, :challenge, SHA1(mail))) = :code
 SQL
-    ) ;
+        );
 
         $stmt->execute(array(
             ':challenge' => isset($_SESSION[self::session_key]['challenge']) ? $_SESSION[self::session_key]['challenge'] : '',
@@ -349,11 +358,32 @@ SQL
         unset($_SESSION[self::session_key]['challenge']) ;
         // Test de réussite de la sélection
         $stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-        if (($utilisateur = $stmt->fetch()) !== false) {
-            return $utilisateur ;
+        $utilisateur = $stmt->fetch();
+//var_dump( $utilisateur);
+//var_dump($utilisateur !== false);
+        if ($utilisateur !== false) {
+            if($utilisateur->isAdmin()){
+                return Admin::createAdminById($utilisateur->getId());
+                $_SESSION[self::session_key]['admin'] = true;
+            }else{
+                return Particulier::createParticulierById($utilisateur->getId());
+                $_SESSION[self::session_key]['admin'] = true;
+            }
+            //return $utilisateur;
         }
         else {
             throw new AuthenticationException("Login/pass incorrect") ;
         }
+    }
+
+    public function isAdmin(){
+        $sql ="SELECT id_Utilisateur from Admin where id_Utilisateur = :id";
+        $pdo = myPDO::getInstance();
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(array(":id"=>$this->id_Utilisateur));
+        if($stmt->fetch() !== false){
+            return true;
+        }
+        return false;
     }
 }

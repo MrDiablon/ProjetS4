@@ -5,9 +5,11 @@ require_once 'autoload.include.php' ;
 
 $p = new WebPage('Connexion') ;
 
+//var_dump($_REQUEST);
+
 try {
     // Tentative de connexion
-    $user = Utilisateur::createFromAuth($_REQUEST) ;
+    $user = Utilisateur::createFromAuthSHA1($_REQUEST) ;
     $user->saveIntoSession() ;
     
 header("Location: http://{$_SERVER['SERVER_NAME']}/".dirname($_SERVER['PHP_SELF'])) ;
