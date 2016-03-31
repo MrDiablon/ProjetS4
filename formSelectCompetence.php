@@ -28,7 +28,7 @@ $html.=<<<HTML
 		<select id="sousCompetence" name="sousCompetence" style="display:none">
 		</select>
 
-		<input type="button" value="Ajouter La competence" onclick="ajoutCompt()">
+		<input type="button" id="btnAjoutCompetence" value="Ajouter La competence" onclick="ajoutCompt()" style="display:none">
 	</div>
 	<div>
 		<select name="comptSelect" multiple>

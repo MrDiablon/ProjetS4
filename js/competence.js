@@ -1,13 +1,13 @@
 function getSousComp(c){
 	var id =c.value;
-	console.log(c.value);
+//console.log(c.value);
 	var request = new Request({
 		url: 'getSouscompetence.php',
 		method: 'get',
 		parameters: {'id' : id},
 		handleAs   : 'json',
 		onSuccess: function(res){
-console.log(res);
+//console.log(res);
 			var select = $("#sousCompetence");
 			select.children().remove();
 			$("#sousCompetenceLabel").css("display", "block");
@@ -17,14 +17,21 @@ console.log(res);
 				select.append(option);
 			});
 			select.css("display","block");
+			var btnAjout = $("#btnAjoutCompetence");
+			btnAjout.css("display","block");
 		},
 		onError: function(error){
-			console.log(error);
+			//console.log(error);
 		}
 	});
 }
 
 function ajoutCompt(){
-	var select = $("#sousCompetence");
+	var select = $("#sousCompetence option:selected");
 	var ajout = $("#comptSelect");
+	var option = $("<option>");
+//console.log(select.val(),select.text());
+	option.val(select.val()).text(select.text());
+	ajout.append(option);
+console.log(ajout);
 }
