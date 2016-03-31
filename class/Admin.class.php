@@ -87,4 +87,47 @@ class Admin extends Utilisateur{
 
         return true;
     }
+
+    public static function countAdmin(){
+        $pdo = myPDO::getInstance();
+        $sql = "select count(id_Utilisateur) from Admin";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();z
+        $retour = $stmt->fetch();
+        if($retour !== FALSE){
+            return $retour;
+        }
+        return 0;
+    }
+
+    public static function getByNb($deb,$nb){
+        $pdo = myPDO::getInstance() ;
+      
+      if(!is_integer($deb) && !is_integer($nb)){
+            $nb= intval($nb);
+            $deb = intval($deb);
+            if ($nb == 0) {
+                $nb = 5;
+            }
+      }
+        //questionnement de la BD
+      $sql=<<<SQL
+      select  nom,prenom,image,note_Moyenne
+      from Admin
+      order by nom desc
+      limit :deb , :nb
+SQL;
+
+      //execution de la commande
+      $stmt = $pdo->prepare($sql) ;
+      $stmt-> setFetchMode(PDO::FETCH_CLASS,__CLASS__);
+      if(is_integer($nb)){
+        $stmt->bindParam(':deb', $deb, PDO::PARAM_INT);
+        $stmt->bindParam(':nb', $nb, PDO::PARAM_INT);
+      }
+    
+      $stmt->execute();
+      //recuperation du resultat de la commande sql
+      return $stmt->fetchAll();
+    }
 }

@@ -16,14 +16,16 @@ $html = <<<HTML
 		<input type="text" name="prenom" placeholder="Votre prénom" required><br>
 		<label for="departement">departement</label>
 		<select id="departement" onchange="getVille(this)">
-			<option>Autre</option>
+			<option value="0">Autre</option>
 HTML;
+//Departement
 $departement = Particulier::getListDepartement();
 foreach ($departement as $dep) {
 	$html.=<<<HTML
 		<option value="{$dep['id']}">{$dep['departement']}
 HTML;
 }
+//Ville
 $html.=<<<HTML
 		</select><br>
 		<label for="ville_id" id="villeLabel" style="display:none">Ville</label>

@@ -4,13 +4,18 @@ require_once 'myPDO.include.php';
 
 class Competence{
 
-	private $id;
+	private $id_Competence;
 	private $libelle;
 	private $niveau=null;
+	private $competence_Parent;
 	// private $etat=null;
 
+	public function getId(){
+		return $this->id_Competence;
+	}
+
 	//Créer une competence à l'aide d'un id
-  public static function createFromID($id) {
+  	public static function createFromID($id) {
         $stmt = myPDO::getInstance()->prepare(<<<SQL
             SELECT *
             FROM Competence
@@ -57,19 +62,30 @@ SQL
 
 
 		//Retourne les competences pour le niveau en parametre
-		public function getCompetenceByNiveau($niv){
+		public static function getCompetenceByNiveau($niv){
 			$stmt = myPDO::getInstance()->prepare(<<<SQL
-				SELECT id_Competence, libelle
+				SELECT *
 				FROM `Competence`
 				WHERE niveau = ?
 SQL
 		);
 			$stmt->setFetchMode(PDO::FETCH_CLASS, 'Competence') ;
-			$stmt->execute(array($niv));
-			if (($object = $stmt->fetch()) !== false) {
-					return $object ;
-			}
+			$stmt->execute(array($niv+0));
+			return $stmt->fetchAll();
 			throw new Exception('Aucune competence pour ce niveau.');
+		}
+
+		public static function getCompetenceByParents($id){
+			$pdo = myPDO::getInstance();
+			$sql = <<<SQL
+				SELECT libelle, id_Competence as id 
+				FROM Competence
+				WHERE competence_Parent = :id
+SQL;
+
+			$stmt = $pdo->prepare($sql);
+			$stmt->execute(array(":id"=>$id));
+			return $stmt->fetchAll();
 		}
 
 
@@ -104,7 +120,7 @@ SQL
 		public static function setCompetence($lib,$niv){
 			$stmt = myPDO::getInstance()->prepare(<<<SQL
 			UPDATE `Competence` SET `libelle`= ? ,`niveau` =  WHERE id_Competence = ?
-		SQL
+SQL
 			);
 			$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
 			$stmt->execute(array($lib, $niv));
@@ -118,7 +134,7 @@ SQL
 				WHERE id_Competence = (SELECT id_Competence
 																FROM Competence
 																WHERE id_Competence = '$id');
-		SQL
+SQL
 		);
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
 		$stmt->execute() ;
@@ -132,7 +148,7 @@ SQL
 				WHERE id_Competence = (SELECT id_Competence
 																FROM Competence
 																WHERE id_Competence = '$id');
-		SQL
+SQL
 		);
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
 		$stmt->execute() ;

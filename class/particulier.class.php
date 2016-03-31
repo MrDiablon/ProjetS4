@@ -32,7 +32,11 @@ class Particulier extends Utilisateur{
 				$id = 1;
 			}
 		}
-		$sql = "select id_Utilisateur, ville_id, nom, prenom, image, note_Moyenne, date_Naissance, adresse, situation_Professionnelle, num_Tel, mail from Particulier where id_Utilisateur = :id";
+		
+		$sql = "select id_Utilisateur, ville_id, nom, prenom, image, note_Moyenne, date_Naissance,
+		        adresse, situation_Professionnelle, num_Tel, mail
+		        from Particulier
+		        WHERE id_Utilisateur = :id";
 		$stmt = myPDO::getInstance()->prepare($sql);
 		$stmt-> setFetchMode(PDO::FETCH_CLASS,'Particulier');
 		$stmt->execute(array(':id'=>$id));
@@ -54,8 +58,11 @@ class Particulier extends Utilisateur{
 			}
 		}
 		$sql = "INSERT INTO
-			   `particulier`(`id_Utilisateur`, `ville_id`, `nom`, `prenom`, `mdp`, `image`, `note_Moyenne`, `date_Naissance`, `adresse`, `situation_Professionnelle`, `num_Tel`, `mail`)
-			    VALUES (:id_Utilisateur, :ville_id, :nom, :prenom, :mdp, :image, :note_Moyenne, :date_Naissance, :adresse, :situation_Professionnelle, :num_Tel, :mail)";
+			   `particulier`(`id_Utilisateur`, `ville_id`, `nom`,
+			   `prenom`, `mdp`, `image`, `note_Moyenne`, `date_Naissance`,
+			   `adresse`, `situation_Professionnelle`, `num_Tel`, `mail`)
+			    VALUES (:id_Utilisateur, :ville_id, :nom, :prenom, :mdp, :image, :note_Moyenne,
+			    :date_Naissance, :adresse, :situation_Professionnelle, :num_Tel, :mail)";
 		$stmt = self::$pdo->prepare($sql);
 //var_dump($params['mail']);
 		$stmt->execute(array(':id_Utilisateur' => $id,
@@ -180,7 +187,8 @@ class Particulier extends Utilisateur{
 			}
 		}
 		$pdo = myPDO::getInstance();
-        $sql = "select ville_id as id , ville_nom_reel as ville from Villes_france where ville_departement = :id order by ville";
+        $sql = "select ville_id as id , ville_nom_reel as ville from Villes_france
+                where ville_departement = :id order by ville";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(":id",$id , PDO::PARAM_INT);
         $stmt->execute();
@@ -190,7 +198,8 @@ class Particulier extends Utilisateur{
 
     public static function getListDepartement(){
     	$pdo = myPDO::getInstance();
-    	$sql = "select departement_id as id, departement_nom as departement from Departement order by departement";
+    	$sql = "select departement_code as id, departement_nom as departement
+    	        from Departement order by departement";
     	$stmt = $pdo->prepare($sql);
     	$stmt->execute();
     	return $stmt->fetchAll();
@@ -220,15 +229,17 @@ class Particulier extends Utilisateur{
 	  }
 	  	//questionnement de la BD
       $sql=<<<SQL
-	  select *
-	  from Evenement
-	  order by dateEve desc
+	  select id_Utilisateur, ville_id, nom, prenom,
+	         image, note_Moyenne, date_Naissance, adresse,
+	         situation_Professionnelle, num_Tel, mail
+	  from Particulier
+	  order by nom desc
 	  limit :deb , :nb
 SQL;
 
       //execution de la commande
       $stmt = $pdo->prepare($sql) ;
-      $stmt-> setFetchMode(PDO::FETCH_CLASS,'Evenement');
+      $stmt-> setFetchMode(PDO::FETCH_CLASS, __CLASS__);
       if(is_integer($nb)){
       	$stmt->bindParam(':deb', $deb, PDO::PARAM_INT);
       	$stmt->bindParam(':nb', $nb, PDO::PARAM_INT);

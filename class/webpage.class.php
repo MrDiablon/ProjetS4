@@ -146,6 +146,7 @@ HTML
         <title>{$this->title}</title>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="bootstrap-theme.min.css">
+        <script type='text/javascript' src='js/request.js'></script>
 {$this->head}
     </head>
     <body>
