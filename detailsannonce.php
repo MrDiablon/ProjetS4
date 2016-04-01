@@ -92,8 +92,10 @@ HTML;
 try {
     // Tentative de connexion
     $user = Utilisateur::createFromSession() ;
-
-
+    $postulant= Annonce::getPostulantByIdAnnonce($id_annonce);
+  
+   
+ // var_dump($antoine);  
     if($user->getId()!=$id_annonceur){
        $html.=<<<HTML
         <input type="button" name="postuler" id="bouton" value="Postuler a cette annonce" style="width:200px" onclick="cacher()">
@@ -113,10 +115,10 @@ try {
 	  }
        </script>
 HTML;
-	}
+	} 
 
     else {
-    $postulant= Annonce::getAllPostulation();
+    
       $html .=<<<HTML
       <table class="table table-striped">
 		<tr>
@@ -134,21 +136,22 @@ HTML;
 
 
 foreach($postulant as $postulants){
-	$id_postulant = $postulants->getIdAnnonceur();
+//var_dump($postulants);
+	$id_postulant = $postulants['id_Utilisateur'];
 	$postulant = Particulier::createParticulierById($id_postulant);
 	$nom_postulant = $postulant ->getNom();
 	$prenom_postulant = $postulant ->getPrenom();
 	$mail_postulant= $postulant->getMail();
-	$descri = $postulants->getPourquoi();
+	$descri = $postulants['pourquoi'];
 	
-	$remu = $postulants->getremuneration_Souhaite();
+	$remu = $postulants['remuneration_Souhaite'];
 	
      
 	$html.="<tr>
 			<td width=100 align='left' >{$prenom_postulant}    {$nom_postulant}</td>
 			<td width=100 align='left'>{$descri}</td>
 			<td width=100 align='left'>{$remu}</td>
-			<td width=100 align='left'> <input type='button' name='lien1' value='Accepter' onclick=''></td>
+			<td width=100 align='left'> <input type='button' name='lien1' value='Accepter' onclick='valid()'></td>
 			
 			
 		</tr>";
@@ -156,10 +159,17 @@ foreach($postulant as $postulants){
 
 
 $html .= <<<HTML
-<script>
-	  function select(){
-	    $("div#form").css("display","block");
-	    $("#bouton").css("display","none");
+<script>	  
+	  function valid(){
+	    $.ajax({
+	      type:"POST",
+	      url: "accepterPostulation.php",
+	      data: {"id_postulant":$id_postulant,"id_annonce":$id_annonce},
+	      dataType : "text",
+	      succes: function(){
+		
+	      }
+	    });
 	  }
        </script>
 

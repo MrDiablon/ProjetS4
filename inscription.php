@@ -92,7 +92,7 @@ if(isset($_POST['inscription'])){
 //var_dump( file_get_contents($image['tmp_name']) );
 					$params['image'] = file_get_contents($image['tmp_name']);
 					$message = "upload reussie";
-					
+
 				}else{
 					$message .= "|Une erreur lié à l'image est survenue !";
 				}
@@ -104,10 +104,14 @@ if(isset($_POST['inscription'])){
 //var_dump($params);
 	$user = Particulier::createParticulier($params);
 	if($message != "upload reussie" && $message != ""){
-		echo "<script>alert($message)</script>"; 
+		echo "<script>alert($message)</script>";
 	}else{
+		//var_dump($_SERVER['SERVER_NAME']);
+		mail($user->getMail(),"Validation de compte","Ceci est un mail automatique pour confirmer l'inscription au site\r\n
+													 Veuillez cliquer sur le lien suivant \n\r
+													 http://{$_SERVER['SERVER_NAME']}/".dirname($_SERVER['PHP_SELF'])."?key={$user->getKey()}");
 		echo "<script>alert(\"inscription reussie un mail de confirmation as été envoyer\")</script>";
-		echo '<meta http-equiv="refresh" content="0; URL=index.php">';
+		//echo '<meta http-equiv="refresh" content="0; URL=index.php">';
 	}
 }
 
