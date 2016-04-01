@@ -35,7 +35,7 @@ class Particulier extends Utilisateur{
 				$id = 1;
 			}
 		}
-		
+
 		$sql = "select id_Utilisateur, ville_id, nom, prenom, image, note_Moyenne, date_Naissance,
 		        adresse, situation_Professionnelle, num_Tel, mail, etat
 		        from Particulier
@@ -55,7 +55,7 @@ class Particulier extends Utilisateur{
 
 	/************************************************
     * Manipulation BD                               *
-    ************************************************/	
+    ************************************************/
 
 	public static function create($params, $id){
 		if(!is_int($id)){
@@ -65,13 +65,13 @@ class Particulier extends Utilisateur{
 			}
 		}
 
-		$key = ""
+		$key = "";
 		do{
-			$key = parent::randomString(16);	
-		}while ( keyIsPossible($key));
+			$key = parent::randomString(16);
+		}while ( self::keyIsPossible($key));
 
 		$sql = "INSERT INTO
-			   `particulier`(`id_Utilisateur`, `ville_id`, `nom`,
+			   `Particulier`(`id_Utilisateur`, `ville_id`, `nom`,
 			   `prenom`, `mdp`, `image`, `note_Moyenne`, `date_Naissance`,
 			   `adresse`, `situation_Professionnelle`, `num_Tel`, `mail`,`etat`,`key_valid`)
 			    VALUES (:id_Utilisateur, :ville_id, :nom, :prenom, :mdp, :image, 0,
@@ -89,7 +89,7 @@ class Particulier extends Utilisateur{
 							 ':situation_Professionnelle' => $params['situation_Professionnelle'],
 							 ':num_Tel' => $params['num_Tel'],
 							 ':mail' => $params['mail'],
-							 ':key'=>$key);
+							 ':key'=>$key)
 		);
 
 	}
@@ -175,17 +175,17 @@ SQL;
 
     	$pdo = myPDO::getInstance();
     	$sql = <<<SQL
-    		select id_Utilisateur from Particulier 
+    		select id_Utilisateur from Particulier
     		where  key_valid = :key
 SQL;
-		$stmt = $pso->prepare($sql);
+		$stmt = $pdo->prepare($sql);
 		$stmt->execute(array(":key"=>$key));
 		$res = $stmt->fetch();
 		if($res !== false){
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
     }
 
 	public function count(){
@@ -207,7 +207,7 @@ SQL;
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute(array(":gds" => $gds, ":value" => $value));
 		$retour = $stmt->fetch();
-		
+
 		if(!$retour){
 			return -1;
 		}
@@ -268,7 +268,7 @@ SQL;
 
     public static function getByNb($deb,$nb){
     	$pdo = myPDO::getInstance() ;
-	  
+
 	  if(!is_integer($deb) && !is_integer($nb)){
 			$nb= intval($nb);
 			$deb = intval($deb);
@@ -293,7 +293,7 @@ SQL;
       	$stmt->bindParam(':deb', $deb, PDO::PARAM_INT);
       	$stmt->bindParam(':nb', $nb, PDO::PARAM_INT);
   	  }
-  	
+
       $stmt->execute();
       //recuperation du resultat de la commande sql
       return $stmt->fetchAll();
@@ -317,7 +317,7 @@ SQL;
 	******************************************************/
 
 
-	
+
 
 	public function getNom(){
 		return $this->nom;
@@ -386,7 +386,7 @@ SQL;
         $stmt->execute(array(':id' => $this->id_Utilisateur));
 
         $res = $stmt->fetchAll();
-        
+
         foreach ($res as $re){
             $competences[] = Competence::createFromID($res['id']);
         }
@@ -394,7 +394,7 @@ SQL;
     }
 */
 
-	
+
 	public function getDate_Naissance(){
 		return $this->date_Naissance;
 	}
@@ -466,18 +466,18 @@ SQL;
 	public function getKey(){
         $pdo = myPDO::getInstance();
         $sql = <<<SQL
-        	select key_valid from particulier
+        	select key_valid from Particulier
         	where id_Utilisateur = :id
 SQL;
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute(array(":id"=>$this->id_Utilisateur));
 		$retour = $stmt->fetch();
 		if($retour !== false){
-			return $retour;
+			return $retour['key_valid'];
 		}
 
 		throw new NotKeyException("Aucune clé trouver dans la BD");
-		
+
     }
 
 
