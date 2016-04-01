@@ -9,7 +9,7 @@ $p->appendJsUrl("js/cryptagemdp.js");
 $p->appendJsUrl("js/request.js");
 //var_dump($_POST);
 $html = <<<HTML
-	<form method="post" action="#" enctype="multipart/form-data" onSubmit="crypter(this)">
+	<form method="post" action="#" enctype="multipart/form-data" onSubmit="crypterMdp(this)">
 		<label for="nom">Nom</label>
 		<input type="text" name="nom" placeholder="Votre nom" required><br>
 		<label for="prenom">Prénom</label>
@@ -51,9 +51,9 @@ $html.=<<<HTML
 		<label for="mail">Mail</label>
 		<input type="mail" name="mail" placeholder="Votre mail" required><br>
 		<label for="mdp">Mots de passe</label>
-		<input type="password" id="mdp" name="mdp" pattern="^[A-Za-z1-9]{6,25}$" onkeyup="verifPass(this)" required><br>
+		<input type="password" id="mdp" name="mdp" pattern="^[A-Za-z0-9]{6,25}$" onkeyup="verifPass(this)" required><br>
 		<label for="mdp">Ressaisire le mots de passe</label>
-		<input type="password" name="mdp2" id="mdp2" pattern="^[A-Za-z1-9]{6,25}$" onkeyup="verifPass(this)" required><br>
+		<input type="password" name="mdp2" id="mdp2" pattern="^[A-Za-z0-9]{6,25}$" onkeyup="verifPass(this)" required><br>
 		<label for="image">Image</label>
 		<input type="hidden" name="MAX_FILE_SIZE" value="250000" >
 		<input type="file" name="image"><br>
@@ -103,10 +103,10 @@ if(isset($_POST['inscription'])){
 	}
 //var_dump($params);
 	$user = Particulier::createParticulier($params);
-	var_dump($message);
-	if($message != "upload reussie" || $message != ""){
+	if($message != "upload reussie" && $message != ""){
 		echo "<script>alert($message)</script>"; 
 	}else{
+		echo "<script>alert(\"inscription reussie un mail de confirmation as été envoyer\")</script>";
 		echo '<meta http-equiv="refresh" content="0; URL=index.php">';
 	}
 }

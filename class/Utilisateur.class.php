@@ -283,7 +283,7 @@ HTML;
             <script type='text/javascript' src='js/sha1.js'></script>
             <script type='text/javascript'>
                 function crypter(f, challenge) {
-console.log(challenge);
+//console.log(challenge);
                     if (f.mail.value.length && f.password.value.length) {
                         f.code.value = SHA1(SHA1(f.password.value)+challenge+SHA1(f.mail.value)) ;
                         f.mail.value = f.password.value = '' ;

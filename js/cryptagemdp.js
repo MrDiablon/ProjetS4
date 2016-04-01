@@ -1,15 +1,20 @@
-function crypter(f){
+function crypterMdp(f){
+
 	if(f.mdp.value.length){
 		f.mdp.value = SHA1(f.mdp.value);
 		f.mdp2.value = "";
 	}
+	/*var mdp = $("#mdp");
+	mdp.val(SHA1(mdp.val()));
+	$("#mdp2").val("")
+console.log(mdp.val());*/
 }
 
 function verifPass(){
 //console.log(document.getElementById("mdp2").value);
 	var mpd = document.getElementById("mdp");
 	var mpd2 = document.getElementById("mdp2");
-	var regex = new RegExp("^[A-Za-z1-9]{6,25}$");
+	var regex = new RegExp("^[A-Za-z0-9]{6,25}$");
 //console.log(regex.test(mpd.value),regex.test(mdp2.value));
 	if(regex.test(mpd.value) || regex.test(mdp2.value)){
 //console.log(regex.test(mpd.value),regex.test(mdp2.value));
