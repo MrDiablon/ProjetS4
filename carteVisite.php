@@ -78,7 +78,7 @@ $note = $part->getNote_moyenne();
 // On affiche les informations
 $html.="<tr>
 			<td align='center' width='80' height='80'>
-				<img src='photo.php?id=2' width='70px' height='70px'>
+				<img src='photo.php?id=1' width='70px' height='70px'>
 			</td>
 			<td align='center'> {$nom} {$prenom} </td>
 			
@@ -135,32 +135,97 @@ $html.="<table class='table table-striped'>
 
 $competences = $part->accederCompetences();
 
-
-
+$id=null;
+$html.="<div id='liste'>";
 foreach($competences as $COMPETENCE){
-	
+	$id = $COMPETENCE->getId();
 	$niveau = $COMPETENCE->getNiveau();
 	$competences = competence::getCompetenceByParents($COMPETENCE->getId());
 	//var_dump($competences);
 	if($niveau == 0){
 		$lib = $COMPETENCE->getLibelle();
-		$html.="• {$lib} <div><button type='button' class='glyphicon glyphicon-plus' ></div>";
-	}
+		$html.="<div id='lib'> {$lib} </div>
+					<div id='num'>
+						<div id='buttons'>
+							<button type='button' id='add' class='glyphicon glyphicon-plus' onclick='modif'>
+						</div><hr>";
+	} 	
 	else{
 		$libelle = $COMPETENCE->getLibelle();
-		$html.= "<div><span class='glyphicon glyphicon-arrow-right'></span>    {$libelle} </div><br/>";
+		$html.= "		<div id='souslib'>
+								<div>
+								<span class='glyphicon glyphicon-arrow-right'></span>
+									{$libelle}
+								<button type='button' id='remove' class='glyphicon glyphicon-minus' onclick='delete'>
+								</div>
+						</div><hr>";
+
+		
 	}
 }
+$html.="			</div>
+				</div>";
 
+
+
+$html.="</div>
+		
+		<div id='ajouter'>
+		<label>Ajoutez vos compétences :</label>
+			<button id='valider' type='button' name='Ajouter une compétence' class='glyphicon glyphicon-pencil' style='width:100px' onclick='cacher()'>
+		</div>
+
+		<script>
+      		function cacher(){
+        		$('div#form').css('display','inline-block');
+        		$('#button').css('display','none');
+      		}
+       </script>";
 
 //Lister les annonces demandées et réalisées par l'utilisateur
+$html.="<div id='form' style=\"display:none\">";
 
+		include('formSelectCompetence.php');
 
+				
+		$html.= "</div>";
 
 
 $web = new WebPage('Carte de visite') ;
+$web->appendJsUrl("js/competence.js");
 $web->appendCssUrl("bootstrap/css/bootstrap.min.css");
 $web->appendCssUrl("bootstrap/css/style.css");
+$web->appendCss(" #liste{
+ 					border-style:double;
+ 					border-color:black;
+					margin-bottom:50px;
+					margin-top:30px;
+					text-align:center;
+				}
+
+				#buttons{
+					display:inline-block;
+					margin-left:10px;
+				}
+
+				#ajouter{
+					display:inline;
+					margin-left:40%;
+					padding-bottom:20%;
+				}
+
+				#remove{
+					margin-left:3%;
+				}
+
+				#add{
+					margin-top:5%;
+				}
+
+				#lib{
+					font-weight:bold
+				}");
+
 
 $web->appendContent($html) ;
 

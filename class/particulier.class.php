@@ -155,6 +155,18 @@ SQL;
 							 ':id_Competence'=>$id_Competence));
 	}
 
+	public function deleteCompetence($id_Competence){
+		$pdo = myPDO::getInstance();
+		$sql = <<<SQL
+			DELETE FROM `posseder`(`id_Utilisateur`, `id_Competence`)
+			WHERE id_Utilisateur = :id
+			AND id_Competence = :id
+SQL;
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute(array(':id_Utilisateur'=>$this->id_Utilisateur,
+							 ':id_Competence'=>$id_Competence));
+	}
+
 	/************************************************
     * Questionnement de a BD                        *
     ************************************************/

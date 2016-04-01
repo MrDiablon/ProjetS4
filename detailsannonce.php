@@ -103,6 +103,7 @@ HTML;
 catch (AuthenticationException $e) {
     // Récuperation de l'exception si connexion échouée
     $web->appendContent("Échec d'authentification&nbsp;: {$e->getMessage()} Mauvais login/mot de passe") ;
+    echo('<meta http-equiv="refresh" content="0; URL=connexion.php">');
 }
 catch (Exception $e) {
     $web->appendContent("Un problème est survenu&nbsp;: {$e->getMessage()} Veuillez vous connecter ! ");

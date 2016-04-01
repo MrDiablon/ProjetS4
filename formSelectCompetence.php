@@ -1,13 +1,12 @@
 <?php
 
-require_once 'autoload.include.php';
+/*require_once 'autoload.include.php';
 
-$p = new webPage('Competence');
-$p->appendJsUrl("js/competence.js");
+$p = new webPage('Competence');*/
 //$p->appendJsUrl("js/request.js");
 //var_dump($_POST);
 $competences = competence::getCompetenceByNiveau(0);
-$html = <<<HTML
+$html .= <<<HTML
 	<form method="post" action="#" onsubmit="ajouterCompetence(); return false">
 		<div style="float:left">
 			<label for="competence">Selection une categorie</label>
@@ -39,6 +38,6 @@ $html.=<<<HTML
 		<input type="submit" value="Valider">
 	</form>
 HTML;
-
+/*
 $p->appendContent($html);
-echo $p->toHTML();
+echo $p->toHTML();*/

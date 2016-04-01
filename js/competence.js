@@ -66,3 +66,4 @@ function ajouterCompetence(){
 	});
 	return false;
 }
+
