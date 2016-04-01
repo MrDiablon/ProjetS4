@@ -18,6 +18,7 @@ $html =<<<HTML
 			<!--<th>Description de l'annonce</th>-->
 			<th>Date de l'annonce</th>
 			<th>Remuneration de l'annonce</th>
+			<th>Type de competence demandée</th>
 		</tr>
 HTML;
 
@@ -31,12 +32,15 @@ foreach($annonce as $ANNONCE){
 	$remu = $ANNONCE->getRemuneration();
 	$id_annonce = $ANNONCE->getIdAnnonce();
 	$id_annonceur = $ANNONCE->getIdAnnonceur();
+	$libCompetence = Competence::getLibelleByIdAnnonce($ANNONCE->getIdAnnonce());
+	
      
 	$html.="<tr height=50 onclick=\"window.open('detailsannonce.php?id={$id_annonce}')\">
 			<td width=100 align='left' >{$titre}</td>
 			<!--<td width=100 align='left'>{$descri}</td>-->
 			<td width=100 align='left'>{$date}</td>
 			<td width=100 align='left'>{$remu} €</td>
+			<td width=100 align='left'>{$libCompetence['libelle']}</td>
 			
 			
 		</tr>";

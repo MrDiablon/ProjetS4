@@ -10,6 +10,7 @@ $titre=null;
 $descri=null;
 $date=null;
 $remu=null;
+$competence = null;
 
 //$lib=$_POST['competence'];
 //$niv=$_POST['detailscompetence'];
@@ -36,16 +37,22 @@ $remu=null;
   if (isset($_POST['remuneration'])){
 	$remu=$_POST['remuneration'];
   }
+
+  $competence = Competence::createFromID(Competence::getIdbyLibelle($lib));
+  $competence->setID(intval($competence->getID()));
+
+  var_dump($competence);
  
 //Competence::addCompetence($lib,$niv);
-Annonce::addAnnonce($titre,$descri,$date,$remu);
-var_dump($date);
+Annonce::addAnnonce($titre,$descri,$date,$remu,$competence);
+//var_dump($date);
 $html =<<<HTML
 <!--<p>La compétence {$lib} ainsi que son niveau {$niv} ont bien été ajoutés</p>-->
 {$titre}
 {$descri}
 {$date}
 {$remu}
+{$competence->getLibelle()}
 HTML;
 
 

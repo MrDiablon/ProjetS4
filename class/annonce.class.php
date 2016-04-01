@@ -12,13 +12,13 @@ class Annonce
 				**********************************/
 
 	//ID de l'Annonce - int
-	private $id_annonce = null; 
+	private $id_Annonce = null; 
 	//ID de l'annonceur - int
 	private $id_annonceur = null; 
 	//ID du travailleur - int
 	private $id_travailleur = null;
-	//ID de la compétence - int
-	private $id_competence = null;
+	//Compétence associée à l'annonce - Compétence
+	private $competence = null;
 	//Titre de l'annonce - String 
 	private $titre = null; 
 	//Description de l'annonce faite par l'annonceur - String
@@ -116,8 +116,8 @@ SQL
 		return $this->commentaire;
 	}
 
-	public function getIdCompetence(){
-		return $this->id_competence;
+	public function getCompetence(){
+		return $this->competence;
 	}
 
 				/**********************************
@@ -188,7 +188,7 @@ SQL
         return $stmt->fetch();
         }
 
-    public static function getCompetenceByID($id){
+    public static function getIdCompetenceByID($id){
         $sql = "SELECT id_Competence FROM Necessiter WHERE id_Annonce = :id";
         $pdo = myPDO::getInstance();
         $stmt = $pdo->prepare($sql);
@@ -288,15 +288,15 @@ SQL
 							':id_Annonce' => $this->id_Annonce)) ;
 	}
 
-	public function setIdCompetence($value){
+	public function setCompetence($value){
 		$this->id_competence = $value;
 
 		$pdo = myPDO::getInstance();
-		$sql = "UPDATE Necessiter SET id_Competence = :id_Competence 
-								  WHERE id_Annonce = :id_Annonce";
+		$sql = "UPDATE Necessiter 	SET id_Competence = :id_Competence 
+								  	WHERE id_Annonce = :id_Annonce";
 		$stmt = $pdo->prepare($sql);
 		$req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$req->execute(array(':id_Competence' => $value,
+		$req->execute(array(':id_Competence' => $value->getId(),
 							':id_Annonce' => $this->id_Annonce)) ;
 	}
 
@@ -309,17 +309,24 @@ SQL
 	* Création d'une instance de l'annonce créee
 	* return: l'instance 
 	*/
-	public static function addAnnonce($title, $desc, $dat,$remun){
+	public static function addAnnonce($title, $desc, $date,$remun, $competence){
+		$user = User::createFromSession();
 		$pdo = myPDO::getInstance();
 		$sql1 = (<<<SQL
-			INSERT INTO `Annonce`(`id_Utilisateur`,`Uti_id_Utilisateur`,`note`,`commentaire`,`titre`,`description`,
-								  `date`,`remuneration`) VALUES (1,2,0,"",?,?,?,?)
+			INSERT INTO Annonce (`id_Utilisateur`,`Uti_id_Utilisateur`,`note`,`commentaire`,`titre`,`description`,
+								  `date`,`remuneration`) 
+			VALUES (?,null,0,"",?,?,?,?)
 SQL
 	);
 		
 		$stmt = $pdo->prepare($sql1);
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-		$stmt->execute(array($title, $desc, $date,$remun));
+		$stmt->execute(array($user->id(), $title, $desc, $date,$remun));
+
+		$sql2 = "INSERT INTO Necessiter (`id_Competence`, `id_Annonce`) VALUES (?,?)";
+		$stmt2 = $pdo->prepare($sql2);
+		$stmt2->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
+		$stmt2->execute(array($competence->getID(), $pdo->lastInsertID() ));
 
 		/*$sql2 = "SELECT id_Annonce FROM Annonce WHERE id_Annonce = :id_Annonce";
 		$stmt = $pdo->prepare($sql2);
@@ -330,6 +337,8 @@ SQL
 
 		return $instance;*/
 	}
+
+
 
 
 	/**
