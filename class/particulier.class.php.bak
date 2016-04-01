@@ -423,10 +423,6 @@ SQL;
 		return $this->num_Tel;
 	}
 
-	public function getMail(){
-		return $this->mail;
-	}
-
 	 /**
     * Fonction permettant de retourner les annonces selon les compétences
     * du particulier

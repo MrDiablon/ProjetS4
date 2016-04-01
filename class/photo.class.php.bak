@@ -23,7 +23,7 @@ class Photo {
     public static function createFromId($id) {
         $stmt = myPDO::getInstance()->prepare(<<<SQL
             SELECT image
-            FROM Particulier
+            FROM particulier
             WHERE id_Utilisateur = ?
 SQL
         ) ;

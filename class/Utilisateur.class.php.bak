@@ -145,7 +145,7 @@ SQL
         $text = htmlspecialchars($text, ENT_COMPAT, 'utf-8') ;
         return <<<HTML
         <form action='$action' method='POST'>
-            <input type='submit' value="$text" class="btn btn-danger btn-lg" name='logout'>
+            <input type='submit' value="$text" class="btn btn-danger" name='logout'>
         </form>
 HTML;
     }
@@ -174,19 +174,6 @@ HTML;
             || (   isset($_SESSION[self::session_key]['user'])
                 && $_SESSION[self::session_key]['user'] instanceof Utilisateur) ;
     }
-
-    /**
-    * Un utilisateur est-il admin ?
-    *
-    * @return bool admin ou non
-    */
-   static public function isAdministrator() {
-       self::startSession() ;
-       return (   isset($_SESSION[self::session_key]['connected'])
-               && $_SESSION[self::session_key]['connected'])
-           || (   isset($_SESSION[self::session_key]['admin'])
-               && $_SESSION[self::session_key]['admin']) ;
-   }
 
     /**
      * Sauvegarde de l'objet Utilisateur dans la session
@@ -381,7 +368,7 @@ SQL
                 $_SESSION[self::session_key]['admin'] = true;
             }else{
                 return Particulier::createParticulierById($utilisateur->getId());
-                $_SESSION[self::session_key]['admin'] = false;
+                $_SESSION[self::session_key]['admin'] = true;
             }
             //return $utilisateur;
         }

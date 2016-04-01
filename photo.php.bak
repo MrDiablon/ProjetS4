@@ -8,7 +8,7 @@ try {
         throw new Exception("Paramètre manquant") ;
     }
 
-    $photo = Photo::createFromId($_GET['id']) ;
+    $photo = photo::createFromId($_GET['id']) ;
     //var_dump($photo);
     header('Content-Type: image/jpeg') ;
     echo $photo->getJPEG() ;

@@ -42,7 +42,7 @@ if (isset($_GET['id'])){
 	$part = particulier::createParticulierById($id);
 }
 else{
-	$user = Utilisateur::createFromSession() ;
+	$user = utilisateur::createFromSession() ;
 	$id_part = $user->getId();
 	$part = particulier::createParticulierById($user->getId());
 

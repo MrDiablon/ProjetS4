@@ -23,52 +23,35 @@ class Menu {
   				<div class="collapse navbar-collapse navHeaderCollapse">
 					<ul class="nav navbar-nav navbar-right">
 HTML;
-		/*if(substr($link, 0, 6) == '/index' || $link == '/')
-			$items .= '<li class="active">';
-		else
-			$items .= '<li>';
-		$items .= '<a href="index.php">Accueil</a> </li>';*/
-		//$items .= '<li><a href="index.php" data-toggle="modal" data-target=".bs-example-modal-sm">Connexion</a> </li>';
-        $form = Utilisateur::loginFormSHA1('connexion.php');
+
+        $barreRecherche = <<<HTML
+            <li id="barreRecherche">
+            <form name="recherche" action="recherche.php" method="GET" class="input-group" aria-describedby="recherche">
+              <input type="text" class="form-control" name="r"
+HTML;
+        /*if(substr($link, strlen($link)-14, strlen($link)) == '/recherche.php') {
+        $recherche = isset($_GET['r']) ? $_GET['r'] : null;
+        $barreRecherche .= <<<HTML
+        value="{$recherche}"
+HTML;
+        }*/
+        $barreRecherche .= <<<HTML
+        placeholder="Rechercher une annonce" style="width: 400px;" required>
+    <span class="input-group-btn" >
+      <button type="submit" class="btn btn-default" id="recherche" value="Rechercher"><span class="glyphicon glyphicon-search" ></span></button>
+              </span>
+ </form>
+        </li>
+HTML;
+
         if (!Utilisateur::isConnected()) {
-        $connexion = <<<HTML
-            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-              Connexion
-            </button>
-
-            <a href='inscription.php'>
-            <button type="button" class="btn btn-primary btn-lg">
-              Inscription
-            </button>
-            </a>
-
-
-
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Connexion</h4>
-                  </div>
-                  <div class="modal-body">
-                    {$form}
-                  </div>
-                  <!--<div class="modal-footer">
-                  </div>-->
-                </div>
-              </div>
-            </div>
-HTML;
-        } else {
-          $user = Utilisateur::createFromSession() ;
-          $connexion = <<<HTML
-          <li><a href="Formulaireannonce.php">Créer une annonce</a></li>
-          <li><a href="carteVisite.php?ida={$user->getId()}" title="Afficher mon profil">{$user->prenomNom()}</a></li>
-          <li>
-HTML;
-          $connexion .= Utilisateur::logoutForm('Déconnexion', 'index.php') ;
-          $connexion .= "</li>";
+            $connexion = SELF::menuVisiteur();
+        }
+        else if (Utilisateur::isAdministrator()){
+            $connexion = SELF::menuAdministrateur();
+        }
+        else {
+            $connexion = SELF::menuParticulier();
         }
 
     $end = <<<HTML
@@ -85,10 +68,82 @@ HTML;
     	<script src ="bootstrap/js/bootstrap.js"></script>
 HTML;
 
-      $this->appendHTML($start) ;
-      $this->appendHTML($items) ;
-      $this->appendHTML($connexion) ;
-      $this->appendHTML($end);
+    $this->appendHTML($start) ;
+	$this->appendHTML($barreRecherche) ;
+	$this->appendHTML($connexion) ;
+	$this->appendHTML($end);
+    }
+
+    public function menuVisiteur() {
+        $form = Utilisateur::loginFormSHA1('connexion.php');
+        $visit = "";
+        $link = "$_SERVER[REQUEST_URI]";
+        if(substr($link, strlen($link)-14, strlen($link)) != '/connexion.php' && substr($link, strlen($link)-10, strlen($link)) != '/connexion') {
+            $visit .= <<<HTML
+                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+                  Connexion
+                </button>
+
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Connexion</h4>
+                      </div>
+                      <div class="modal-body">
+                        {$form}
+                      </div>
+                      <!--<div class="modal-footer">
+                      </div>-->
+                    </div>
+                  </div>
+                </div>
+HTML;
+        }
+        $visit .= <<<HTML
+                <a href='inscription.php'>
+                <button type="button" class="btn btn-primary btn-lg">
+                  Inscription
+                </button>
+                </a>
+HTML;
+        return $visit;
+    }
+
+    public function menuParticulier() {
+        try {
+            $user = Utilisateur::createFromSession() ;
+            $form = Utilisateur::logoutForm('Déconnexion', 'index.php') ;
+            return <<<HTML
+            <li><a href="Formulaireannonce.php">Créer une annonce</a></li>
+            <li><a href="mesAnnonces.php" title="Afficher les annonces que j'ai publié">Mes annonces</a></li>
+            <!--<li><a href="" title="Voir les avis que j'ai publié/reçu">Avis</a></li>-->
+            <li><a href="carteVisite.php?ida={$user->getId()}" title="Afficher mon profil">{$user->prenomNom()}</a></li>
+            <li>{$form}</li>
+HTML;
+        }
+        catch (notInSessionException $e) {
+
+        }
+    }
+
+    public function menuAdministrateur() {
+        try {
+            $user = Utilisateur::createFromSession() ;
+            $form = Utilisateur::logoutForm('Déconnexion', 'index.php') ;
+            return <<<HTML
+            <li><a href="Formulaireannonce.php">Créer une annonce</a></li>
+            <li><a href="" title="Afficher les annonces que j'ai publié">Mes annonces</a></li>
+            <li><a href="" title="Voir les avis que j'ai publié/reçu">Avis</a></li>
+            <li><a href="">Gérer les annonces</a></li>
+            <li><a href="carteVisite.php?ida={$user->getId()}" title="Afficher mon profil">{$user->prenomNom()}</a></li>
+            <li>{$form}</li>
+HTML;
+        }
+        catch (notInSessionException $e) {
+
+        }
     }
 
     public function appendHTML($content) {

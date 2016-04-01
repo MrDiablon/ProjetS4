@@ -92,7 +92,7 @@ class Admin extends Utilisateur{
         $pdo = myPDO::getInstance();
         $sql = "select count(id_Utilisateur) from Admin";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute();z
         $retour = $stmt->fetch();
         if($retour !== FALSE){
             return $retour;

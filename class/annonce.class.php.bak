@@ -73,8 +73,6 @@ SQL
 		return $stmt->fetchAll();
 	}
 	
-
-
 	public static function getAllPostulation() {
 		$stmt = myPDO::getInstance()->prepare(<<<SQL
 			SELECT *
@@ -105,37 +103,6 @@ SQL
 		return $this->remuneration_Souhaite;
 	}
 	
-	public static function getMine() {
-		try {
-			$user = Utilisateur::createFromSession() ;
-			$stmt = myPDO::getInstance()->prepare(<<<SQL
-				SELECT *
-				FROM Annonce
-				WHERE id_Utilisateur = ?
-				ORDER BY date;
-SQL
-			);
-			$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
-			$stmt->execute(array($user->getId()));
-			return $stmt->fetchAll();
-	}
-		catch(notInSessionException $e) {
-			header("Location: http://{$_SERVER['SERVER_NAME']}/".dirname($_SERVER['PHP_SELF'])."/connexion.php") ;
-		}
-	}
-
-	public static function recherche($recherche) {
-		$stmt = myPDO::getInstance()->prepare(<<<SQL
-		SELECT *
-		FROM Annonce
-		WHERE titre LIKE :recherche;
-SQL
-		);
-		$stmt->bindValue(':recherche', '%'.$recherche.'%');
-		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
-		$stmt->execute();
-		return $stmt->fetchAll();
-	}
 	public function getIdAnnonce(){
 		return $this->id_Annonce;
 	}
