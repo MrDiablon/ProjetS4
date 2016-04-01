@@ -387,4 +387,8 @@ SQL
         }
         return false;
     }
+
+    public function getMail(){
+        return $this->mail;
+    }
 }

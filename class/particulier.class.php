@@ -2,6 +2,8 @@
 
 require_once 'autoload.include.php';
 
+class NotKeyException extends Exception { }
+
 class Particulier extends Utilisateur{
 	//protected $id_Utilisateur;
 	private $ville_id;
@@ -9,6 +11,7 @@ class Particulier extends Utilisateur{
 	private $adresse;
 	private $situation_Professionnelle;
 	private $num_Tel;
+	private $etat;
 
 	/************************************************
     * Constructeur                                  *
@@ -34,7 +37,7 @@ class Particulier extends Utilisateur{
 		}
 		
 		$sql = "select id_Utilisateur, ville_id, nom, prenom, image, note_Moyenne, date_Naissance,
-		        adresse, situation_Professionnelle, num_Tel, mail
+		        adresse, situation_Professionnelle, num_Tel, mail, etat
 		        from Particulier
 		        WHERE id_Utilisateur = :id";
 		$stmt = myPDO::getInstance()->prepare($sql);
@@ -61,12 +64,18 @@ class Particulier extends Utilisateur{
 				$id = 1;
 			}
 		}
+
+		$key = ""
+		do{
+			$key = parent::randomString(16);	
+		}while ( keyIsPossible($key));
+
 		$sql = "INSERT INTO
 			   `particulier`(`id_Utilisateur`, `ville_id`, `nom`,
 			   `prenom`, `mdp`, `image`, `note_Moyenne`, `date_Naissance`,
-			   `adresse`, `situation_Professionnelle`, `num_Tel`, `mail`)
-			    VALUES (:id_Utilisateur, :ville_id, :nom, :prenom, :mdp, :image, :note_Moyenne,
-			    :date_Naissance, :adresse, :situation_Professionnelle, :num_Tel, :mail)";
+			   `adresse`, `situation_Professionnelle`, `num_Tel`, `mail`,`etat`,`key_valid`)
+			    VALUES (:id_Utilisateur, :ville_id, :nom, :prenom, :mdp, :image, 0,
+			    :date_Naissance, :adresse, :situation_Professionnelle, :num_Tel, :mail,0,:key)";
 		$stmt = self::$pdo->prepare($sql);
 //var_dump($params['mail']);
 		$stmt->execute(array(':id_Utilisateur' => $id,
@@ -75,12 +84,12 @@ class Particulier extends Utilisateur{
 							 ':prenom' => $params['prenom'],
 							 ':mdp' => $params['mdp'],
 							 ':image' => (isset($params['image'])) ? $params['image'] : null,
-							 ':note_Moyenne' => 0,
 							 ':date_Naissance' => $params['date_Naissance'],
 							 ':adresse' => $params['adresse'],
 							 ':situation_Professionnelle' => $params['situation_Professionnelle'],
 							 ':num_Tel' => $params['num_Tel'],
-							 ':mail' => $params['mail'])
+							 ':mail' => $params['mail'],
+							 ':key'=>$key);
 		);
 
 	}
@@ -159,7 +168,28 @@ SQL;
     * Questionnement de a BD                        *
     ************************************************/
 
+    private function keyIsPossible($key){
+    	if((!is_string($key) && $key != "") || (is_int($key) && $key != 0)){
+    		return false;
+    	}
+
+    	$pdo = myPDO::getInstance();
+    	$sql = <<<SQL
+    		select id_Utilisateur from Particulier 
+    		where  key_valid = :key
+SQL;
+		$stmt = $pso->prepare($sql);
+		$stmt->execute(array(":key"=>$key));
+		$res = $stmt->fetch();
+		if($res !== false){
+			return false;
+		}
+
+		return true;
+    }
+
 	public function count(){
+		$pdo = myPDO::getInstance();
 		$sql = "count(id_Utilisateur) from Particulier";
 		$stmt = $pdo->prepare($sql);
 		$stmt->execute();
@@ -381,10 +411,6 @@ SQL;
 		return $this->num_Tel;
 	}
 
-	public function getMail(){
-		return $this->mail;
-	}
-
 	 /**
     * Fonction permettant de retourner les annonces selon les compétences
     * du particulier
@@ -437,6 +463,22 @@ SQL;
             return $annoncesParticulier;
 	        }}
 
+	public function getKey(){
+        $pdo = myPDO::getInstance();
+        $sql = <<<SQL
+        	select key_valid from particulier
+        	where id_Utilisateur = :id
+SQL;
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute(array(":id"=>$this->id_Utilisateur));
+		$retour = $stmt->fetch();
+		if($retour !== false){
+			return $retour;
+		}
+
+		throw new NotKeyException("Aucune clé trouver dans la BD");
+		
+    }
 
 
 	/*****************************************************
