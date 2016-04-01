@@ -19,6 +19,8 @@ HTML;
 
 //$id_annonceur =null;
 //$id_travailleur =null;
+
+/*
 if (!isset($_GET['ida'])){
 	$id_annonceur=$_GET['idt'];
 	$part = particulier::createParticulierById($id_annonceur);
@@ -30,16 +32,27 @@ if(!isset($_GET['idt'])){
 else{
 	$user = Utilisateur::createFromSession() ;
 	$part = particulier::createParticulierById($user->getId());	
-}
+}*/
+
 //var_dump($id_annonceur);
 //var_dump($id_travailleur);
 
+if (!isset($_GET['id'])){
+	$id=$_GET['id'];
+	$part = particulier::createParticulierById($id);
+}
+else{
+	$user = utilisateur::createFromSession() ;
+	$id_part = $user->getId();
+	$part = particulier::createParticulierById($user->getId());
 
+}
  
 $html =<<<HTML
 	<table class="table table-striped">
 		<tr>
 				<th height="60" colspan=2>Carte de visite</th>
+
 		</tr>
 HTML;
 
@@ -78,7 +91,7 @@ $note = $part->getNote_moyenne();
 // On affiche les informations
 $html.="<tr>
 			<td align='center' width='80' height='80'>
-				<img src='photo.php?id=1' width='70px' height='70px'>
+				<img src='photo.php?id=1', width='70px' height='70px'>
 			</td>
 			<td align='center'> {$nom} {$prenom} </td>
 			
@@ -130,7 +143,7 @@ $html.="</div></td>
 //Lister les compétences de l'utilisateur
 $html.="<table class='table table-striped'>
 			<tr>
-				<th height='60' colspan=2>Liste des compétences</th>
+				<th height='50' colspan=2>Liste des compétences</th>
 			</tr></table>";
 
 $competences = $part->accederCompetences();
@@ -156,7 +169,7 @@ foreach($competences as $COMPETENCE){
 								<div>
 								<span class='glyphicon glyphicon-arrow-right'></span>
 									{$libelle}
-								<button type='button' id='remove' class='glyphicon glyphicon-minus' onclick='delete'>
+								<button type='button' id='remove' class='glyphicon glyphicon-minus' onclick='supprimer'>
 								</div>
 						</div><hr>";
 
@@ -180,12 +193,28 @@ $html.="</div>
         		$('div#form').css('display','inline-block');
         		$('#button').css('display','none');
       		}
+
+       </script>
+
+       <script>
+       	function supprimer(){
+      			$.ajax({
+      				type:'GET',
+      				url:'supprimerCompetence.php',
+      				data:{'id_Competence': $id},
+      				success: function(data){
+         					alert('La compétence a été retirée);
+         					window.location.reload('carteVisite.php');
+         					$('#remove').css('display','none');
+      						});
+      		}
        </script>";
 
 //Lister les annonces demandées et réalisées par l'utilisateur
 $html.="<div id='form' style=\"display:none\">";
 
 		include('formSelectCompetence.php');
+
 
 				
 		$html.= "</div>";

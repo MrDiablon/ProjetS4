@@ -6,7 +6,7 @@ $p = new webPage('Competence');*/
 //$p->appendJsUrl("js/request.js");
 //var_dump($_POST);
 $competences = competence::getCompetenceByNiveau(0);
-$html .= <<<HTML
+$html.= <<<HTML
 	<form method="post" action="#" onsubmit="ajouterCompetence(); return false">
 		<div style="float:left">
 			<label for="competence">Selection une categorie</label>
