@@ -82,7 +82,18 @@ SQL
 		);
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
 		$stmt->execute();
+		return $stmt->fetchAll();		
+	}
+	public static function getPostulantByIdAnnonce($id_annonce){
+		$stmt = myPDO::getInstance()->prepare(<<<SQL
+			SELECT *
+			FROM Accepter
+			WHERE id_Annonce=:id
+SQL
+		);
+		$stmt->execute(array(":id"=> $id_annonce));
 		return $stmt->fetchAll();
+		
 	}
 	
 	public function getPourquoi(){
@@ -290,8 +301,7 @@ public function setTitre($value){
         $sql = "UPDATE Annonce SET Uti_id_Utilisateur = :Uti_id_Utilisateur
                                   WHERE id_Annonce = :id_Annonce";
         $stmt = $pdo->prepare($sql);
-        $req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
-        $req->execute(array(':Uti_id_Utilisateur' => $value,
+        $stmt->execute(array(':Uti_id_Utilisateur' => $value,
                             ':id_Annonce' => $this->id_Annonce)) ;
     }
 
@@ -305,6 +315,19 @@ public function setTitre($value){
         $req->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
         $req->execute(array(':id_Competence' => $value,
                             ':id_Annonce' => $this->id_Annonce)) ;
+    }
+    
+    public static function setEtatAccepter($etat,$id_annonce){
+      $pdo = myPDO::getInstance();
+      $sql = <<<SQL
+	  UPDATE `Accepter`
+	  SET `etat`= :etat
+	  WHERE id_Annonce = :id
+SQL;
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute(array(":etat"=>$etat,
+                          ":id"=>$id_annonce));
+                          
     }
 
 
@@ -337,6 +360,18 @@ SQL
 
         return $instance;*/
     }
+    
+    public static function deleteNotAccept($idA,$idU){
+	$pdo = myPDO::getInstance();
+	$sql = <<<SQL
+	    DELETE FROM `Accepter` 
+	    WHERE id_Annonce = :id
+	    and id_Utilisateur != :idU
+SQL;
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute(array(":id"=>$idA,":idU"=>$idU));
+    }
+    
     public static function addPostulation($id_Annonce,$id_Postulant,$pourquoi,$remuneration_souhaite){
        $pdo = myPDO::getInstance();
        $sql1 = (<<<SQL
