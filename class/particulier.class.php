@@ -10,9 +10,9 @@ class Particulier extends Utilisateur{
 	private $situation_Professionnelle;
 	private $num_Tel;
 
-	/**
-     * Constructeur privé
-     */
+	/************************************************
+    * Constructeur                                  *
+    ************************************************/
     private function __construct() {
     }
 
@@ -49,6 +49,10 @@ class Particulier extends Utilisateur{
 
       	return $retour;
 	}
+
+	/************************************************
+    * Manipulation BD                               *
+    ************************************************/	
 
 	public static function create($params, $id){
 		if(!is_int($id)){
@@ -139,6 +143,21 @@ class Particulier extends Utilisateur{
 								 ':mail' => $this->mail));
 		}
 	}
+
+	public function addCompetence($id_Competence){
+		$pdo = myPDO::getInstance();
+		$sql = <<<SQL
+			INSERT INTO `posseder`(`id_Utilisateur`, `id_Competence`)
+			VALUES (:id_Utilisateur,:id_Competence)
+SQL;
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute(array(':id_Utilisateur'=>$this->id_Utilisateur,
+							 ':id_Competence'=>$id_Competence));
+	}
+
+	/************************************************
+    * Questionnement de a BD                        *
+    ************************************************/
 
 	public function count(){
 		$sql = "count(id_Utilisateur) from Particulier";
@@ -407,7 +426,6 @@ SQL;
 	public function setMail($value){
 		$this->mail = $value;
 	}
-
 
 	/*****************************************************
 		GETTER BY ID
