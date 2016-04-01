@@ -96,10 +96,79 @@ try {
 
     if($user->getId()!=$id_annonceur){
        $html.=<<<HTML
-        <input type="button" name="postuler" value="Postuler a cette annonce" style="width:200px" onclick="this.hidden = 'hidden' ">
+        <input type="button" name="postuler" id="bouton" value="Postuler a cette annonce" style="width:200px" onclick="cacher()">
+        <div id="form" style="display:none">
+	  <form name="accepterAnnonce" method="post" action="recupFormPostuAnno.php" >
+	    <input type="hidden" value = "{$user->getId()}"  name="id_postulant">
+	    <input type="hidden" value = "{$id_annonce}"  name="id_annonce">
+	    <label for="pourquoi">Dites a l'annonceur pourquoi il devrait vous choisir  :</label>        <textarea name="pourquoi"></textarea> <br/>
+            <label for="remuneration"> Proposez une remuneration  :</label>                     <input type="intval" name="remuneration"/> <br/>
+            <input type="submit" name="valider" value="Envoyer"/>      
+          </form>
+       </div>
+       <script>
+	  function cacher(){
+	    $("div#form").css("display","block");
+	    $("#bouton").css("display","none");
+	  }
+       </script>
 HTML;
 	}
-}
+
+    else {
+    $postulant= Annonce::getAllPostulation();
+      $html .=<<<HTML
+      <table class="table table-striped">
+		<tr>
+			<th colspan=4>Postulation Disponible</th>
+		</tr>
+		<tr>
+			<th>Nom du postulant</th>
+			<th>Son texte pour vous convaincre</th>
+			<th>Remuneration propose</th>
+			<th></th>
+		</tr>
+HTML;
+
+
+
+
+foreach($postulant as $postulants){
+	$id_postulant = $postulants->getIdAnnonceur();
+	$postulant = Particulier::createParticulierById($id_postulant);
+	$nom_postulant = $postulant ->getNom();
+	$prenom_postulant = $postulant ->getPrenom();
+	$mail_postulant= $postulant->getMail();
+	$descri = $postulants->getPourquoi();
+	
+	$remu = $postulants->getremuneration_Souhaite();
+	
+     
+	$html.="<tr>
+			<td width=100 align='left' >{$prenom_postulant}    {$nom_postulant}</td>
+			<td width=100 align='left'>{$descri}</td>
+			<td width=100 align='left'>{$remu}</td>
+			<td width=100 align='left'> <input type='button' name='lien1' value='Accepter' onclick=''></td>
+			
+			
+		</tr>";
+}	
+
+
+$html .= <<<HTML
+<script>
+	  function select(){
+	    $("div#form").css("display","block");
+	    $("#bouton").css("display","none");
+	  }
+       </script>
+
+	</table>
+HTML;
+    
+    }
+} 
+
 catch (AuthenticationException $e) {
     // Récuperation de l'exception si connexion échouée
     $web->appendContent("Échec d'authentification&nbsp;: {$e->getMessage()} Mauvais login/mot de passe") ;

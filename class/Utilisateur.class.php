@@ -40,33 +40,33 @@ class Utilisateur {
     */
     public static function createUtilisateur($params){
         $pdo = myPDO::getInstance();
-        $sql = "INSERT INTO `utilisateur`(`id_Utilisateur`,`nom`, `prenom`, `mdp`, `image`, `note_Moyenne`,mail) VALUES (null,:nom, :prenom, :mdp, :image, 0, :mail)";
+        $sql = "INSERT INTO `Utilisateur`(`id_Utilisateur`,`nom`, `prenom`, `mdp`, `image`, `note_Moyenne`,mail) VALUES (null,:nom, :prenom, :mdp, :image, 0, :mail)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(array(':nom' => $params['nom'],
                             ':prenom' => $params['prenom'],
                             ':mdp' =>$params['mdp'],
                             ':mail' => $params['mail'],
                             ':image' => (isset($params['image'])) ? $params['image'] : null,));
-        $sql = "SELECT LAST_INSERT_ID() FROM utilisateur";
+        $sql = "SELECT LAST_INSERT_ID() FROM Utilisateur";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
         $id = $stmt->fetch();
         return $id['LAST_INSERT_ID()'];
     }
     public function modif($id){
-        $sql = "UPDATE `utilisateur` SET `nom`=:nom,`prenom`=:prenom,`mdp`=:mdp,`image`=:image,`note_Moyenne`=:note_Moyenne, `mail` = :mail WHERE id_Utilisateur = :id_Utilisateur";
+        $sql = "UPDATE `Utilisateur` SET `nom`=:nom,`prenom`=:prenom,`mdp`=:mdp,`image`=:image,`note_Moyenne`=:note_Moyenne, `mail` = :mail WHERE id_Utilisateur = :id_Utilisateur";
         $stmt = $pdo->prepare($pdo);
         $stmt->execute(array(":nom" => $this->nom,":prenom"=> $this->prenom,":image"=>$this->image,":note_Moyenne" => $this->note_Moyenne,":mail"=>$this->mail,":id_Utilisateur"=> $this->id_Utilisateur));
     }
     
     public function deleteUtilisateur(){
-        $sql = "DELETE FROM `utilisateur` WHERE id_Utilisateur = :id";
+        $sql = "DELETE FROM `Utilisateur` WHERE id_Utilisateur = :id";
         $stmt = $pdo->prepare($pdo);
         $stmt->execute(array(":id"=>$this->id_Utilisateur));
     }
 
     public static function deleteUtilisateurById($id){
-        $sql = "DELETE FROM `utilisateur` WHERE id_Utilisateur = :id";
+        $sql = "DELETE FROM `Utilisateur` WHERE id_Utilisateur = :id";
         $stmt = $pdo->prepare($pdo);
         $stmt->execute(array(":id"=>$id));  
     }
@@ -283,7 +283,7 @@ HTML;
             <script type='text/javascript' src='js/sha1.js'></script>
             <script type='text/javascript'>
                 function crypter(f, challenge) {
-console.log(challenge);
+//console.log(challenge);
                     if (f.mail.value.length && f.password.value.length) {
                         f.code.value = SHA1(SHA1(f.password.value)+challenge+SHA1(f.mail.value)) ;
                         f.mail.value = f.password.value = '' ;
@@ -348,7 +348,7 @@ HTML;
         // Préparation de la requête
         $stmt = myPDO::getInstance()->prepare(<<<SQL
             SELECT id_Utilisateur, prenom, nom, image, note_Moyenne, mail
-            FROM utilisateur
+            FROM Utilisateur
             WHERE SHA1(CONCAT(mdp, :challenge, SHA1(mail))) = :code
 SQL
         );

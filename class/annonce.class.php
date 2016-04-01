@@ -72,7 +72,26 @@ SQL
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
-
+	
+	public static function getAllPostulation() {
+		$stmt = myPDO::getInstance()->prepare(<<<SQL
+			SELECT *
+			FROM Accepter
+			ORDER BY remuneration_Souhaite;
+SQL
+		);
+		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__);
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
+	
+	public function getPourquoi(){
+		return $this->pourquoi;
+	}
+	public function getremuneration_Souhaite(){
+		return $this->remuneration_Souhaite;
+	}
+	
 	public function getIdAnnonce(){
 		return $this->id_Annonce;
 	}
@@ -318,6 +337,21 @@ SQL
 
         return $instance;*/
     }
+    public static function addPostulation($id_Annonce,$id_Postulant,$pourquoi,$remuneration_souhaite){
+       $pdo = myPDO::getInstance();
+       $sql1 = (<<<SQL
+            INSERT INTO `Accepter`(`id_Annonce`, `id_Utilisateur`, `etat`, `pourquoi`, `remuneration_Souhaite`) VALUES (:id_Annonce,:id_Utilisateur,null,:pourquoi,:remuneration)
+SQL
+    );
+
+        $stmt = $pdo->prepare($sql1);
+        $stmt->execute(array(":id_Annonce"=>$id_Annonce,
+			     ":id_Utilisateur"=>$id_Postulant,
+			     ":pourquoi"=>$pourquoi,
+			     ":remuneration"=>$remuneration_souhaite));
+    
+    }
+    
 
 
     /**
