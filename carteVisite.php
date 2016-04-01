@@ -16,8 +16,8 @@ HTML;
 */
 
 
-/*
-$id_annonceur =null;
+
+//$id_annonceur =null;
 //$id_travailleur =null;
 if (!isset($_GET['ida'])){
 	$id_annonceur=$_GET['idt'];
@@ -27,11 +27,14 @@ if(!isset($_GET['idt'])){
 	$id_annonceur=$_GET['ida'];
 	$part = particulier::createParticulierById($id_annonceur);
 }
-*/
+else{
+	$user = Utilisateur::createFromSession() ;
+	$part = particulier::createParticulierById($user->getId());	
+}
 //var_dump($id_annonceur);
 //var_dump($id_travailleur);
 
-$part = particulier::createParticulierById(2);
+
  
 $html =<<<HTML
 	<table class="table table-striped">
@@ -128,25 +131,26 @@ $html.="</div></td>
 $html.="<table class='table table-striped'>
 			<tr>
 				<th height='60' colspan=2>Liste des compétences</th>
-			</tr>";
+			</tr></table>";
 
-/*
 $competences = $part->accederCompetences();
-var_dump($competences);
-*/
 
-/*
-foreach($competence as $COMPETENCE){
-	$libelle = $COMPETENCE->getLibelle();
-	$niveau = $COMPETENCE->getNiveau();
+
+
+foreach($competences as $COMPETENCE){
 	
-	$html.="<tr>
-			<tr height=50>
-			<td width=100 align='center'>{$libelle}</td>
-			<td width=80 align='center'>{$niveau}</td>
-			</tr>";
+	$niveau = $COMPETENCE->getNiveau();
+	$competences = competence::getCompetenceByParents($COMPETENCE->getId());
+	//var_dump($competences);
+	if($niveau == 0){
+		$lib = $COMPETENCE->getLibelle();
+		$html.="• {$lib} <div><button type='button' class='glyphicon glyphicon-plus' ></div>";
+	}
+	else{
+		$libelle = $COMPETENCE->getLibelle();
+		$html.= "<div><span class='glyphicon glyphicon-arrow-right'></span>    {$libelle} </div><br/>";
+	}
 }
-*/
 
 
 //Lister les annonces demandées et réalisées par l'utilisateur

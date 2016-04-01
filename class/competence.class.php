@@ -19,7 +19,7 @@ class Competence{
         $stmt = myPDO::getInstance()->prepare(<<<SQL
             SELECT *
             FROM Competence
-            WHERE id = ?
+            WHERE id_Competence = ?
 SQL
 				) ;
         $stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
@@ -103,6 +103,44 @@ SQL
 		$stmt->setFetchMode(PDO::FETCH_CLASS, __CLASS__) ;
 		$stmt->execute(array($id));
 		}
+
+		/**
+        *Fonction permettant de retourer les annonces en fonction des compétences
+        * de l'utilisateur connecté
+        *return: un tableau d'ID annonces
+        */
+        public function getIdAnnoncesByIdCompetence(){
+            $annonces = array();
+            $pdo  = myPDO::getInstance();
+            $sql  = "SELECT id_Annonce FROM Necessiter
+                    WHERE id_Competence =:id_Competence";
+            $stmt = $pdo->prepare($sql);
+            $stmt-> execute(array(':id_Competence' => $this->id));
+
+            $annonces = $stmt->fetchAll();
+
+            return $annonces;
+        }
+
+        /**
+        *Fonction retournant un tableau contenant toutes les compétences
+        *return : un tableau de compétences
+        **/
+        public static function getAllInstances(){
+            $competences = array();
+            $pdo  = myPDO::getInstance();
+            $sql  = "SELECT id_Competence FROM Competence";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute;
+            $stmt->fetchAll();
+
+            foreach($competences as $comp){
+                $competences[] = self::createFromID($comp);
+            }
+
+            return $competences;
+        }
+
 
 		//Récupère l'id de la competence par libelle
 

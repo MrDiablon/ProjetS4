@@ -344,6 +344,8 @@ SQL;
         return $competences;
     }
 */
+
+	
 	public function getDate_Naissance(){
 		return $this->date_Naissance;
 	}
@@ -363,6 +365,60 @@ SQL;
 	public function getMail(){
 		return $this->mail;
 	}
+
+	 /**
+    * Fonction permettant de retourner les annonces selon les compétences
+    * du particulier
+    * Prise en compte de son département
+    * return: le tableau des annonces le concernant
+    */
+    public function getAnnoncesParticulier(){
+        if(User::isConnected()){
+
+            $annoncesParticulier = array(); //Le tableau qui recevra les instances d'annonces annonces et sera retourné
+            $competencesParticulier = array(); //le tableau qui recevra les instances de competences
+            $idAnnonces = array(); //le tableau qui recevra les ID des annonces
+
+            $pdo  = myPDO::getInstance();
+            $sql  = "SELECT id_Competence FROM Posseder WHERE id_Utilisateur = :id";
+            $stmt = $pdo->prepare($sql);
+            $stmt-> execute(array(':id' => $this->id_Utilisateur));
+            $idComps = $stmt->fetchAll(); //les id competences entrées dans $idComps
+            foreach ($idComps as $idComp){
+                //création des competences par ID et stockage dans un tableau
+                $competencesParticulier[] = Competence::createFromID($idComp);
+
+                //l'ajout à la fin du tableau de l'id annonce contenant les compétences du tableau
+                $idAnnonces[] = end($competencesParticulier)->getIdAnnoncesByIdCompetence();
+            }
+
+            foreach ($idAnnonces as $idAnnonce) {
+                //Selection du département de l'annonceur
+                $sql2 = "SELECT departement_id
+                         FROM Situer
+                         WHERE ville_id = (SELECT ville_id
+                                             FROM Particulier
+                                             WHERE id_Utilisateur = (SELECT id_Utilisateur
+                                                                     FROM Utilisateur
+                                                                     WHERE id_Utilisateur = (SELECT id_Utilisateur
+                                                                                             FROM Annonce
+                                                                                             Where id_Annonce = :id_Annonce";
+                $stmt2 = $pdo->prepare($sql2);
+                $stmt2->execute(array(':id_Annonce' => $idAnnonce));
+                $idDepartAnnonce = $stmt2->fetch();
+
+                //Si le departement de l'annonceur est celui du particulier en cours
+                if($idDepartAnnonce = $this->getDepartement_id()){
+                    //création des annonces par ID et stockage dans un tableau
+                    $annoncesParticulier[] = Annonce::createFromID($idAnnonce);
+                }
+
+            }
+
+            return $annoncesParticulier;
+	        }}
+
+
 
 	/*****************************************************
 		SETTER
